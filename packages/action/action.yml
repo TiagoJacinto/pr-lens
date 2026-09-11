@@ -98,8 +98,9 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        corepack pnpm --dir "${GITHUB_ACTION_PATH}" install --frozen-lockfile
-        corepack pnpm --dir "${GITHUB_ACTION_PATH}" --filter @coldtea/pr-lens-cli... run build
+        corepack prepare pnpm@10.5.2 --activate
+        pnpm --dir "${GITHUB_ACTION_PATH}" install --frozen-lockfile
+        pnpm --dir "${GITHUB_ACTION_PATH}" --filter @coldtea/pr-lens-cli... run build
 
     - name: Analyze the diff
       id: analyze
