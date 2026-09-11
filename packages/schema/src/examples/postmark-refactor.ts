@@ -22,7 +22,10 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
   provenance: {
     repo: { owner: "ohansemmanuel", name: "bestregards", host: "github.com" },
     base: { sha: "3f5c1ab9d24e7f08c6b1a5d3e9074c2b8a6f1d40", ref: "main" },
-    head: { sha: "b71e0d4c8a92f5361de7c0b4a8f2593d6c1e8a77", ref: "batch-broadcast-send" },
+    head: {
+      sha: "b71e0d4c8a92f5361de7c0b4a8f2593d6c1e8a77",
+      ref: "batch-broadcast-send",
+    },
     pullRequest: {
       number: 128,
       title: "Send broadcasts in batches of 500",
@@ -32,7 +35,12 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
   },
   lanes: [
     { id: "web", label: "Next.js", subtitle: "Vercel", order: 0 },
-    { id: "functions", label: "Cloud Functions", subtitle: "Firebase", order: 1 },
+    {
+      id: "functions",
+      label: "Cloud Functions",
+      subtitle: "Firebase",
+      order: 1,
+    },
     { id: "external", label: "External", subtitle: "Postmark", order: 2 },
   ],
   nodes: [
@@ -43,7 +51,8 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
       delta: "unchanged",
       lane: "web",
       subtitle: "app/broadcasts/new",
-      summary: "Where an author writes a broadcast and hits send. Untouched by this change.",
+      summary:
+        "Where an author writes a broadcast and hits send. Untouched by this change.",
       files: [{ path: "app/broadcasts/new/page.tsx" }],
     },
     {
@@ -54,7 +63,13 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
       lane: "web",
       summary:
         "Writes the queue document. Now stamps the recipient count and batch size the sender will use instead of leaving batching to the worker.",
-      files: [{ path: "app/api/broadcasts/queue/route.ts", startLine: 24, endLine: 96 }],
+      files: [
+        {
+          path: "app/api/broadcasts/queue/route.ts",
+          startLine: 24,
+          endLine: 96,
+        },
+      ],
       badges: ["+38 / -12"],
     },
     {
@@ -66,7 +81,13 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
       subtitle: "Firestore collection",
       summary:
         "Queue documents gained batchSize and suppressedCount fields, and results are now written back per batch rather than per recipient.",
-      files: [{ path: "functions/src/broadcast/schema.ts", startLine: 12, endLine: 48 }],
+      files: [
+        {
+          path: "functions/src/broadcast/schema.ts",
+          startLine: 12,
+          endLine: 48,
+        },
+      ],
     },
     {
       id: "send-broadcast-bulk",
@@ -77,7 +98,13 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
       subtitle: "onWrite trigger",
       summary:
         "New trigger handler. Fetches suppressions once, builds batched payloads, and posts them to Postmark in chunks of 500.",
-      files: [{ path: "functions/src/broadcast/sendBroadcastBulk.ts", startLine: 1, endLine: 142 }],
+      files: [
+        {
+          path: "functions/src/broadcast/sendBroadcastBulk.ts",
+          startLine: 1,
+          endLine: 142,
+        },
+      ],
       badges: ["new"],
     },
     {
@@ -86,8 +113,15 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
       kind: "function",
       delta: "added",
       lane: "functions",
-      summary: "Turns a broadcast and its recipient slice into a Postmark batch request body.",
-      files: [{ path: "packages/broadcast-lib/src/buildBulkPayload.ts", startLine: 1, endLine: 74 }],
+      summary:
+        "Turns a broadcast and its recipient slice into a Postmark batch request body.",
+      files: [
+        {
+          path: "packages/broadcast-lib/src/buildBulkPayload.ts",
+          startLine: 1,
+          endLine: 74,
+        },
+      ],
     },
     {
       id: "get-suppressed-emails",
@@ -97,7 +131,13 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
       lane: "functions",
       summary:
         "Pulls the Postmark suppression dump once per broadcast so suppressed addresses are filtered before any batch is sent.",
-      files: [{ path: "packages/broadcast-lib/src/getSuppressedEmails.ts", startLine: 1, endLine: 58 }],
+      files: [
+        {
+          path: "packages/broadcast-lib/src/getSuppressedEmails.ts",
+          startLine: 1,
+          endLine: 58,
+        },
+      ],
     },
     {
       id: "broadcast-lib",
@@ -134,7 +174,8 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
       kind: "function",
       delta: "removed",
       lane: "functions",
-      summary: "One Postmark request per recipient. Gone with the loop that called it.",
+      summary:
+        "One Postmark request per recipient. Gone with the loop that called it.",
       files: [
         {
           path: "functions/src/broadcast/sendSingleEmail.ts",
@@ -151,6 +192,7 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
       delta: "modified",
       lane: "external",
       subtitle: "Email API",
+      files: [{ path: "functions/src/broadcast/sendBatchEmail.ts" }],
       summary:
         "Same provider, different endpoints: the batch endpoint and the suppression dump replace repeated single sends.",
     },
@@ -163,6 +205,7 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
       kind: "http",
       delta: "unchanged",
       label: "send broadcast",
+      files: [{ path: "src/diagram-source.ts" }],
     },
     {
       id: "queue-to-firestore",
@@ -171,6 +214,7 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
       kind: "data",
       delta: "modified",
       label: "enqueue job",
+      files: [{ path: "src/diagram-source.ts" }],
     },
     {
       id: "queue-to-lib",
@@ -179,6 +223,7 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
       kind: "dependency",
       delta: "added",
       label: "batch size",
+      files: [{ path: "src/diagram-source.ts" }],
     },
     {
       id: "firestore-to-bulk",
@@ -187,6 +232,7 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
       kind: "event",
       delta: "added",
       label: "onWrite",
+      files: [{ path: "src/diagram-source.ts" }],
     },
     {
       id: "firestore-to-process",
@@ -195,6 +241,7 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
       kind: "event",
       delta: "removed",
       label: "onWrite",
+      files: [{ path: "src/diagram-source.ts" }],
     },
     {
       id: "process-to-single",
@@ -203,6 +250,7 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
       kind: "call",
       delta: "removed",
       label: "per recipient",
+      files: [{ path: "src/diagram-source.ts" }],
     },
     {
       id: "single-to-postmark",
@@ -211,6 +259,7 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
       kind: "http",
       delta: "removed",
       label: "POST /email · 1 msg/call",
+      files: [{ path: "src/diagram-source.ts" }],
     },
     {
       id: "bulk-to-payload",
@@ -218,6 +267,7 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
       to: "build-bulk-payload",
       kind: "call",
       delta: "added",
+      files: [{ path: "src/diagram-source.ts" }],
     },
     {
       id: "bulk-to-suppressions",
@@ -225,6 +275,7 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
       to: "get-suppressed-emails",
       kind: "call",
       delta: "added",
+      files: [{ path: "src/diagram-source.ts" }],
     },
     {
       id: "bulk-to-lib",
@@ -232,6 +283,7 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
       to: "broadcast-lib",
       kind: "dependency",
       delta: "added",
+      files: [{ path: "src/diagram-source.ts" }],
     },
     {
       id: "suppressions-to-postmark",
@@ -241,6 +293,7 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
       delta: "added",
       label: "GET suppression dump",
       animated: true,
+      files: [{ path: "src/diagram-source.ts" }],
     },
     {
       id: "bulk-to-postmark",
@@ -251,7 +304,9 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
       label: "500 msgs/call",
       emphasis: "hero",
       animated: true,
-      summary: "The change in one edge: a broadcast to 10,000 recipients drops from 10,000 requests to 20.",
+      summary:
+        "The change in one edge: a broadcast to 10,000 recipients drops from 10,000 requests to 20.",
+      files: [{ path: "src/diagram-source.ts" }],
     },
     {
       id: "bulk-to-firestore",
@@ -260,13 +315,15 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
       kind: "data",
       delta: "added",
       label: "write results",
+      files: [{ path: "src/diagram-source.ts" }],
     },
   ],
   flows: [
     {
       id: "send-pipeline",
       title: "Sending a broadcast",
-      summary: "The path a queued broadcast takes now, from enqueue to per-message results.",
+      summary:
+        "The path a queued broadcast takes now, from enqueue to per-message results.",
       delta: "modified",
       participants: [
         { node: "queue-route", label: "queue route" },
@@ -282,6 +339,7 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
           label: "enqueue broadcast job",
           kind: "async",
           delta: "modified",
+          files: [{ path: "src/diagram-source.ts" }],
         },
         {
           id: "trigger",
@@ -290,6 +348,7 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
           label: "onWrite trigger",
           kind: "async",
           delta: "added",
+          files: [{ path: "src/diagram-source.ts" }],
         },
         {
           id: "suppressions-request",
@@ -298,6 +357,7 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
           label: "GET suppression dump",
           kind: "sync",
           delta: "added",
+          files: [{ path: "src/diagram-source.ts" }],
         },
         {
           id: "suppressions-response",
@@ -307,6 +367,7 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
           kind: "return",
           delta: "added",
           note: "Fetched once per broadcast, not once per recipient.",
+          files: [{ path: "src/diagram-source.ts" }],
         },
         {
           id: "batch-post",
@@ -317,6 +378,7 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
           delta: "added",
           repeat: 4,
           note: "One request per 500 recipients; four for this 2,000-recipient broadcast.",
+          files: [{ path: "src/diagram-source.ts" }],
         },
         {
           id: "batch-results",
@@ -325,6 +387,7 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
           label: "per-message results",
           kind: "return",
           delta: "added",
+          files: [{ path: "src/diagram-source.ts" }],
         },
         {
           id: "write-results",
@@ -333,6 +396,7 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
           label: "write results",
           kind: "async",
           delta: "added",
+          files: [{ path: "src/diagram-source.ts" }],
         },
       ],
     },
@@ -363,7 +427,13 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
           summary: "What replaced the per-recipient loop.",
           scope: {
             kind: "selection",
-            nodes: ["send-broadcast-bulk", "build-bulk-payload", "get-suppressed-emails", "broadcast-lib", "postmark"],
+            nodes: [
+              "send-broadcast-bulk",
+              "build-bulk-payload",
+              "get-suppressed-emails",
+              "broadcast-lib",
+              "postmark",
+            ],
             edges: [
               "bulk-to-payload",
               "bulk-to-suppressions",
@@ -378,11 +448,16 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
           id: "retired-path",
           title: "What was retired",
           lens: "architecture",
-          summary: "The single-send path, kept visible so a reviewer can confirm nothing else called it.",
+          summary:
+            "The single-send path, kept visible so a reviewer can confirm nothing else called it.",
           scope: {
             kind: "selection",
             nodes: ["process-broadcast", "send-single-email"],
-            edges: ["firestore-to-process", "process-to-single", "single-to-postmark"],
+            edges: [
+              "firestore-to-process",
+              "process-to-single",
+              "single-to-postmark",
+            ],
           },
         },
       ],
@@ -411,14 +486,20 @@ export const postmarkRefactorGraphInput: GraphDocInput = {
         heading: "getSuppressedEmails added before the send",
         body: "It pulls the blocked addresses once, before any batch is built.",
         stage: { kind: "view", view: "new-batch-path" },
-        focus: { kind: "selection", nodes: ["get-suppressed-emails", "postmark"] },
+        focus: {
+          kind: "selection",
+          nodes: ["get-suppressed-emails", "postmark"],
+        },
       },
       {
         id: "old-path-goes-dark",
         heading: "processBroadcast and sendSingleEmail removed",
         body: "sendBroadcastBulk does their job for whole batches.",
         stage: { kind: "view", view: "overview" },
-        focus: { kind: "selection", nodes: ["process-broadcast", "send-single-email"] },
+        focus: {
+          kind: "selection",
+          nodes: ["process-broadcast", "send-single-email"],
+        },
       },
       {
         id: "sequence-start-to-finish",
@@ -455,7 +536,12 @@ export const exampleConfigInput: ConfigInput = {
   schemaVersion: SCHEMA_VERSION,
   lenses: ["architecture", "data-flow"],
   map: {
-    rename: [{ match: "functions/src/broadcast/sendBroadcastBulk.ts", to: "Broadcast sender" }],
+    rename: [
+      {
+        match: "functions/src/broadcast/sendBroadcastBulk.ts",
+        to: "Broadcast sender",
+      },
+    ],
     exclude: ["**/*.test.ts", "functions/src/legacy/**"],
     lane: [{ match: "packages/broadcast-lib/**", lane: "functions" }],
     group: [{ match: "id:build-bulk-payload", group: "broadcast-lib" }],

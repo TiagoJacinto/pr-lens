@@ -83,6 +83,16 @@ test("publishing replays onto the branch tip rather than failing the run", async
   expect(publishing).toContain("git fetch");
 });
 
+test("the optional canvas publish step is repository-scoped and token-authenticated", async () => {
+  const publishing = await readFile(new URL("../scripts/publish-canvas.sh", import.meta.url), "utf8");
+
+  expect(publishing).toContain("/api/canvas/pr");
+  expect(publishing).toContain("CANVAS_PUBLISH_TOKEN");
+  expect(publishing).toContain("GITHUB_REPOSITORY");
+  expect(Object.keys(action.inputs)).toContain("canvas-url");
+  expect(Object.keys(action.inputs)).toContain("canvas-publish-token");
+});
+
 test("a comment is only ever edited when the account this action comments as wrote it", async () => {
   const commenting = await readFile(new URL("../scripts/comment.sh", import.meta.url), "utf8");
 

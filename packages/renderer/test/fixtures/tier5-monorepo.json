@@ -1,7 +1,7 @@
 {
   "schemaVersion": "0.1.0",
   "kind": "graph",
-  "title": "Tier 5 — monorepo",
+  "title": "Tier 5 \u2014 monorepo",
   "summary": "Six lanes, thirty-seven nodes: a document platform monorepo under heavy change.",
   "lenses": [
     "architecture"
@@ -58,7 +58,7 @@
       "kind": "ui",
       "delta": "unchanged",
       "lane": "web",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -67,7 +67,7 @@
       "kind": "ui",
       "delta": "modified",
       "lane": "web",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -76,7 +76,7 @@
       "kind": "ui",
       "delta": "added",
       "lane": "web",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -85,7 +85,7 @@
       "kind": "ui",
       "delta": "unchanged",
       "lane": "web",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -94,7 +94,7 @@
       "kind": "ui",
       "delta": "modified",
       "lane": "web",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -103,7 +103,7 @@
       "kind": "route",
       "delta": "modified",
       "lane": "api",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -112,7 +112,7 @@
       "kind": "route",
       "delta": "unchanged",
       "lane": "api",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -121,7 +121,7 @@
       "kind": "function",
       "delta": "modified",
       "lane": "api",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -130,7 +130,7 @@
       "kind": "function",
       "delta": "added",
       "lane": "api",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -139,7 +139,7 @@
       "kind": "route",
       "delta": "added",
       "lane": "api",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -148,7 +148,7 @@
       "kind": "route",
       "delta": "removed",
       "lane": "api",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -157,7 +157,7 @@
       "kind": "service",
       "delta": "modified",
       "lane": "services",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -166,7 +166,7 @@
       "kind": "service",
       "delta": "added",
       "lane": "services",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -175,7 +175,7 @@
       "kind": "service",
       "delta": "added",
       "lane": "services",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -184,7 +184,7 @@
       "kind": "service",
       "delta": "unchanged",
       "lane": "services",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -193,7 +193,7 @@
       "kind": "job",
       "delta": "added",
       "lane": "services",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -202,7 +202,7 @@
       "kind": "service",
       "delta": "modified",
       "lane": "services",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -211,7 +211,7 @@
       "kind": "service",
       "delta": "added",
       "lane": "services",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -220,7 +220,7 @@
       "kind": "job",
       "delta": "removed",
       "lane": "services",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -229,7 +229,7 @@
       "kind": "package",
       "delta": "modified",
       "lane": "packages",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -238,7 +238,7 @@
       "kind": "package",
       "delta": "added",
       "lane": "packages",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -247,7 +247,7 @@
       "kind": "package",
       "delta": "unchanged",
       "lane": "packages",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -256,7 +256,7 @@
       "kind": "package",
       "delta": "added",
       "lane": "packages",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -265,7 +265,7 @@
       "kind": "package",
       "delta": "added",
       "lane": "packages",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -274,7 +274,7 @@
       "kind": "package",
       "delta": "modified",
       "lane": "packages",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -283,7 +283,7 @@
       "kind": "package",
       "delta": "removed",
       "lane": "packages",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -292,7 +292,7 @@
       "kind": "datastore",
       "delta": "modified",
       "lane": "data",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -301,7 +301,7 @@
       "kind": "cache",
       "delta": "unchanged",
       "lane": "data",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -310,7 +310,7 @@
       "kind": "datastore",
       "delta": "added",
       "lane": "data",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -319,7 +319,7 @@
       "kind": "datastore",
       "delta": "modified",
       "lane": "data",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -328,7 +328,7 @@
       "kind": "datastore",
       "delta": "unchanged",
       "lane": "data",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -337,7 +337,7 @@
       "kind": "datastore",
       "delta": "added",
       "lane": "data",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -346,7 +346,7 @@
       "kind": "external",
       "delta": "unchanged",
       "lane": "external",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -355,7 +355,7 @@
       "kind": "external",
       "delta": "unchanged",
       "lane": "external",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -364,7 +364,7 @@
       "kind": "external",
       "delta": "added",
       "lane": "external",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -373,7 +373,7 @@
       "kind": "external",
       "delta": "unchanged",
       "lane": "external",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -382,7 +382,7 @@
       "kind": "external",
       "delta": "unchanged",
       "lane": "external",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     }
   ],
@@ -395,7 +395,7 @@
       "delta": "unchanged",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "dashboard-to-editor",
@@ -406,7 +406,7 @@
       "label": "open doc",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "onboarding-to-gql",
@@ -416,7 +416,7 @@
       "delta": "modified",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "dashboard-to-gql",
@@ -427,7 +427,7 @@
       "label": "queries",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "editor-to-upload",
@@ -438,7 +438,7 @@
       "label": "attach file",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "editor-to-uikit",
@@ -449,7 +449,7 @@
       "label": "components",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "admin-to-rest",
@@ -459,7 +459,7 @@
       "delta": "unchanged",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "gql-to-auth",
@@ -469,7 +469,7 @@
       "delta": "modified",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "rest-to-auth",
@@ -479,7 +479,7 @@
       "delta": "unchanged",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "auth-to-limiter",
@@ -489,7 +489,7 @@
       "delta": "added",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "auth-to-authlib",
@@ -500,7 +500,7 @@
       "label": "verify JWT",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "authlib-to-idp",
@@ -511,7 +511,7 @@
       "label": "OIDC",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "limiter-to-redis",
@@ -522,7 +522,7 @@
       "label": "token bucket",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "gql-to-user",
@@ -532,7 +532,7 @@
       "delta": "modified",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "gql-to-doc",
@@ -543,7 +543,7 @@
       "label": "doc ops",
       "emphasis": "hero",
       "animated": true,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "upload-to-blob",
@@ -554,7 +554,7 @@
       "label": "put object",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "user-to-postgres",
@@ -564,7 +564,7 @@
       "delta": "modified",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "postgres-to-user",
@@ -575,7 +575,7 @@
       "label": "CDC stream",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "doc-to-collab",
@@ -586,7 +586,7 @@
       "label": "presence",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "doc-to-indexer",
@@ -596,7 +596,7 @@
       "delta": "added",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "doc-to-export",
@@ -606,7 +606,7 @@
       "delta": "added",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "doc-to-schema",
@@ -617,7 +617,7 @@
       "label": "doc model",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "doc-to-markdown",
@@ -627,7 +627,7 @@
       "delta": "added",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "doc-to-openai",
@@ -638,7 +638,7 @@
       "label": "summarize",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "collab-to-redis",
@@ -649,7 +649,7 @@
       "label": "presence state",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "redis-to-collab",
@@ -660,7 +660,7 @@
       "label": "pubsub",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "collab-to-schema",
@@ -670,7 +670,7 @@
       "delta": "added",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "indexer-to-cluster",
@@ -681,7 +681,7 @@
       "label": "index doc",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "indexer-to-markdown",
@@ -692,7 +692,7 @@
       "label": "strip markup",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "export-to-blob",
@@ -703,7 +703,7 @@
       "label": "write PDF",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "export-to-markdown",
@@ -713,7 +713,7 @@
       "delta": "added",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "user-to-notify",
@@ -723,7 +723,7 @@
       "delta": "unchanged",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "notify-to-sendgrid",
@@ -734,7 +734,7 @@
       "label": "email",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "billing-to-stripe",
@@ -745,7 +745,7 @@
       "label": "invoices",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "billing-to-postgres",
@@ -755,7 +755,7 @@
       "delta": "modified",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "billing-to-warehouse",
@@ -766,7 +766,7 @@
       "label": "revenue facts",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "user-to-billing",
@@ -777,7 +777,7 @@
       "label": "plan check",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "billing-to-user",
@@ -788,7 +788,7 @@
       "label": "entitlements",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "doc-to-outbox",
@@ -799,7 +799,7 @@
       "label": "domain events",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "outbox-to-notify",
@@ -810,7 +810,7 @@
       "label": "outbox poll",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "uikit-to-telemetry",
@@ -820,7 +820,7 @@
       "delta": "added",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "telemetry-to-sentry",
@@ -831,7 +831,7 @@
       "label": "errors",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "client-to-gql",
@@ -842,7 +842,7 @@
       "label": "typed calls",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "schema-to-client",
@@ -853,7 +853,7 @@
       "label": "codegen",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "dashboard-to-legacy",
@@ -864,7 +864,7 @@
       "label": "v1 calls (was)",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "legacyrest-to-legacysync",
@@ -875,7 +875,7 @@
       "label": "sync (was)",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "legacysync-to-xml",
@@ -885,7 +885,7 @@
       "delta": "removed",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "legacysync-to-postgres",
@@ -896,7 +896,7 @@
       "label": "bulk upsert (was)",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "doc-to-xml",
@@ -907,7 +907,7 @@
       "label": "xml export (was)",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     }
   ],
   "flows": [],

@@ -289,8 +289,7 @@
                     "maxLength": 2000
                   },
                   "files": {
-                    "default": [],
-                    "description": "Backing source locations, used to build diff permalinks.",
+                    "minItems": 1,
                     "maxItems": 64,
                     "type": "array",
                     "items": {
@@ -316,7 +315,8 @@
                           "maximum": 9007199254740991
                         },
                         "revision": {
-                          "description": "Which side of the diff the lines refer to. Defaults to head.",
+                          "default": "head",
+                          "description": "Which side of the diff the lines refer to.",
                           "type": "string",
                           "enum": [
                             "head",
@@ -334,7 +334,8 @@
                         ]
                       },
                       "description": "A file (and optional line range) backing an element."
-                    }
+                    },
+                    "description": "Backing source locations, used to build diff permalinks."
                   },
                   "badges": {
                     "default": [],
@@ -354,7 +355,8 @@
                   "label",
                   "kind",
                   "delta",
-                  "lane"
+                  "lane",
+                  "files"
                 ],
                 "additionalProperties": false,
                 "description": "A node in the architecture graph."
@@ -445,10 +447,20 @@
                     "minLength": 1,
                     "maxLength": 2000
                   },
-                  "files": {
+                  "badges": {
                     "default": [],
-                    "description": "Backing source locations, used to build diff permalinks.",
-                    "maxItems": 64,
+                    "description": "Extra chips on the card, beyond the delta badge the renderer adds.",
+                    "maxItems": 6,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 120,
+                      "description": "Short display label."
+                    }
+                  },
+                  "files": {
+                    "minItems": 1,
                     "type": "array",
                     "items": {
                       "type": "object",
@@ -473,7 +485,8 @@
                           "maximum": 9007199254740991
                         },
                         "revision": {
-                          "description": "Which side of the diff the lines refer to. Defaults to head.",
+                          "default": "head",
+                          "description": "Which side of the diff the lines refer to.",
                           "type": "string",
                           "enum": [
                             "head",
@@ -491,18 +504,6 @@
                         ]
                       },
                       "description": "A file (and optional line range) backing an element."
-                    }
-                  },
-                  "badges": {
-                    "default": [],
-                    "description": "Extra chips on the card, beyond the delta badge the renderer adds.",
-                    "maxItems": 6,
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "minLength": 1,
-                      "maxLength": 120,
-                      "description": "Short display label."
                     }
                   }
                 },
@@ -619,7 +620,7 @@
                     "description": "One or two sentences of plain prose. No markdown headings."
                   },
                   "files": {
-                    "default": [],
+                    "minItems": 1,
                     "maxItems": 32,
                     "type": "array",
                     "items": {
@@ -645,7 +646,8 @@
                           "maximum": 9007199254740991
                         },
                         "revision": {
-                          "description": "Which side of the diff the lines refer to. Defaults to head.",
+                          "default": "head",
+                          "description": "Which side of the diff the lines refer to.",
                           "type": "string",
                           "enum": [
                             "head",
@@ -671,7 +673,8 @@
                   "from",
                   "to",
                   "kind",
-                  "delta"
+                  "delta",
+                  "files"
                 ],
                 "additionalProperties": false,
                 "description": "A directed connection between two nodes."
@@ -765,8 +768,7 @@
                     "description": "One or two sentences of plain prose. No markdown headings."
                   },
                   "files": {
-                    "default": [],
-                    "maxItems": 32,
+                    "minItems": 1,
                     "type": "array",
                     "items": {
                       "type": "object",
@@ -791,7 +793,8 @@
                           "maximum": 9007199254740991
                         },
                         "revision": {
-                          "description": "Which side of the diff the lines refer to. Defaults to head.",
+                          "default": "head",
+                          "description": "Which side of the diff the lines refer to.",
                           "type": "string",
                           "enum": [
                             "head",
@@ -983,7 +986,7 @@
                           "maxLength": 2000
                         },
                         "files": {
-                          "default": [],
+                          "minItems": 1,
                           "maxItems": 32,
                           "type": "array",
                           "items": {
@@ -1009,7 +1012,8 @@
                                 "maximum": 9007199254740991
                               },
                               "revision": {
-                                "description": "Which side of the diff the lines refer to. Defaults to head.",
+                                "default": "head",
+                                "description": "Which side of the diff the lines refer to.",
                                 "type": "string",
                                 "enum": [
                                   "head",
@@ -1035,7 +1039,8 @@
                         "from",
                         "to",
                         "label",
-                        "delta"
+                        "delta",
+                        "files"
                       ],
                       "additionalProperties": false,
                       "description": "One ordered step in a flow."
@@ -1129,7 +1134,6 @@
                   },
                   "messages": {
                     "minItems": 1,
-                    "maxItems": 64,
                     "type": "array",
                     "items": {
                       "type": "object",
@@ -1199,7 +1203,7 @@
                           "maxLength": 2000
                         },
                         "files": {
-                          "default": [],
+                          "minItems": 1,
                           "maxItems": 32,
                           "type": "array",
                           "items": {
@@ -1225,7 +1229,8 @@
                                 "maximum": 9007199254740991
                               },
                               "revision": {
-                                "description": "Which side of the diff the lines refer to. Defaults to head.",
+                                "default": "head",
+                                "description": "Which side of the diff the lines refer to.",
                                 "type": "string",
                                 "enum": [
                                   "head",
@@ -1251,12 +1256,12 @@
                         "from",
                         "to",
                         "label",
-                        "delta"
+                        "delta",
+                        "files"
                       ],
                       "additionalProperties": false,
                       "description": "One ordered step in a flow."
-                    },
-                    "description": "Ordered by array position."
+                    }
                   }
                 },
                 "additionalProperties": false

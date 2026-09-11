@@ -16,7 +16,8 @@ export const broadcastBaselineGraphInput: GraphDocInput = {
   id: "bestregards-broadcast-baseline",
   generatedAt: "2026-08-12T09:02:00.000Z",
   title: "Broadcast sending",
-  summary: "How a broadcast reaches its recipients: queued from the web app, sent one message at a time by a Firestore trigger.",
+  summary:
+    "How a broadcast reaches its recipients: queued from the web app, sent one message at a time by a Firestore trigger.",
   lenses: ["architecture", "data-flow"],
   provenance: {
     repo: { owner: "ohansemmanuel", name: "bestregards", host: "github.com" },
@@ -26,7 +27,12 @@ export const broadcastBaselineGraphInput: GraphDocInput = {
   },
   lanes: [
     { id: "web", label: "Next.js", subtitle: "Vercel", order: 0 },
-    { id: "functions", label: "Cloud Functions", subtitle: "Firebase", order: 1 },
+    {
+      id: "functions",
+      label: "Cloud Functions",
+      subtitle: "Firebase",
+      order: 1,
+    },
     { id: "external", label: "External", subtitle: "Postmark", order: 2 },
   ],
   nodes: [
@@ -81,6 +87,7 @@ export const broadcastBaselineGraphInput: GraphDocInput = {
       delta: "unchanged",
       lane: "external",
       subtitle: "Email API",
+      files: [{ path: "functions/src/broadcast/sendSingleEmail.ts" }],
     },
   ],
   edges: [
@@ -91,6 +98,7 @@ export const broadcastBaselineGraphInput: GraphDocInput = {
       kind: "http",
       delta: "unchanged",
       label: "send broadcast",
+      files: [{ path: "src/diagram-source.ts" }],
     },
     {
       id: "queue-to-firestore",
@@ -99,6 +107,7 @@ export const broadcastBaselineGraphInput: GraphDocInput = {
       kind: "data",
       delta: "unchanged",
       label: "enqueue job",
+      files: [{ path: "src/diagram-source.ts" }],
     },
     {
       id: "firestore-to-process",
@@ -107,6 +116,7 @@ export const broadcastBaselineGraphInput: GraphDocInput = {
       kind: "event",
       delta: "unchanged",
       label: "onWrite",
+      files: [{ path: "src/diagram-source.ts" }],
     },
     {
       id: "process-to-single",
@@ -115,6 +125,7 @@ export const broadcastBaselineGraphInput: GraphDocInput = {
       kind: "call",
       delta: "unchanged",
       label: "per recipient",
+      files: [{ path: "src/diagram-source.ts" }],
     },
     {
       id: "single-to-postmark",
@@ -123,6 +134,7 @@ export const broadcastBaselineGraphInput: GraphDocInput = {
       kind: "http",
       delta: "unchanged",
       label: "POST /email · 1 msg/call",
+      files: [{ path: "src/diagram-source.ts" }],
     },
   ],
   flows: [
@@ -144,6 +156,7 @@ export const broadcastBaselineGraphInput: GraphDocInput = {
           label: "enqueue broadcast job",
           kind: "async",
           delta: "unchanged",
+          files: [{ path: "src/diagram-source.ts" }],
         },
         {
           id: "trigger",
@@ -152,6 +165,7 @@ export const broadcastBaselineGraphInput: GraphDocInput = {
           label: "onWrite trigger",
           kind: "async",
           delta: "unchanged",
+          files: [{ path: "src/diagram-source.ts" }],
         },
         {
           id: "single-post",
@@ -162,6 +176,7 @@ export const broadcastBaselineGraphInput: GraphDocInput = {
           delta: "unchanged",
           repeat: 2000,
           note: "One request per recipient.",
+          files: [{ path: "src/diagram-source.ts" }],
         },
         {
           id: "single-result",
@@ -170,6 +185,7 @@ export const broadcastBaselineGraphInput: GraphDocInput = {
           label: "message id",
           kind: "return",
           delta: "unchanged",
+          files: [{ path: "src/diagram-source.ts" }],
         },
         {
           id: "write-result",
@@ -179,6 +195,7 @@ export const broadcastBaselineGraphInput: GraphDocInput = {
           kind: "async",
           delta: "unchanged",
           repeat: 2000,
+          files: [{ path: "src/diagram-source.ts" }],
         },
       ],
     },
@@ -207,7 +224,8 @@ export const broadcastBaselinePatchInput: PatchDocInput = {
   schemaVersion: SCHEMA_VERSION,
   kind: "patch",
   generatedAt: "2026-08-19T18:31:00.000Z",
-  summary: "Fold the batch send path into the baseline map and retire the single-send path.",
+  summary:
+    "Fold the batch send path into the baseline map and retire the single-send path.",
   target: {
     graphId: "bestregards-broadcast-baseline",
     fromSha: BASE_SHA,
@@ -223,7 +241,8 @@ export const broadcastBaselinePatchInput: PatchDocInput = {
         delta: "unchanged",
         lane: "functions",
         subtitle: "onWrite trigger",
-        summary: "Fetches suppressions once, then posts batched payloads of 500 to Postmark.",
+        summary:
+          "Fetches suppressions once, then posts batched payloads of 500 to Postmark.",
         files: [{ path: "functions/src/broadcast/sendBroadcastBulk.ts" }],
       },
     },
@@ -270,6 +289,7 @@ export const broadcastBaselinePatchInput: PatchDocInput = {
         kind: "event",
         delta: "unchanged",
         label: "onWrite",
+        files: [{ path: "src/diagram-source.ts" }],
       },
     },
     {
@@ -280,6 +300,7 @@ export const broadcastBaselinePatchInput: PatchDocInput = {
         to: "build-bulk-payload",
         kind: "call",
         delta: "unchanged",
+        files: [{ path: "src/diagram-source.ts" }],
       },
     },
     {
@@ -290,6 +311,7 @@ export const broadcastBaselinePatchInput: PatchDocInput = {
         to: "get-suppressed-emails",
         kind: "call",
         delta: "unchanged",
+        files: [{ path: "src/diagram-source.ts" }],
       },
     },
     {
@@ -300,6 +322,7 @@ export const broadcastBaselinePatchInput: PatchDocInput = {
         to: "broadcast-lib",
         kind: "dependency",
         delta: "unchanged",
+        files: [{ path: "src/diagram-source.ts" }],
       },
     },
     {
@@ -311,6 +334,7 @@ export const broadcastBaselinePatchInput: PatchDocInput = {
         kind: "dependency",
         delta: "unchanged",
         label: "batch size",
+        files: [{ path: "src/diagram-source.ts" }],
       },
     },
     {
@@ -322,6 +346,7 @@ export const broadcastBaselinePatchInput: PatchDocInput = {
         kind: "http",
         delta: "unchanged",
         label: "GET suppression dump",
+        files: [{ path: "src/diagram-source.ts" }],
       },
     },
     {
@@ -333,6 +358,7 @@ export const broadcastBaselinePatchInput: PatchDocInput = {
         kind: "http",
         delta: "unchanged",
         label: "500 msgs/call",
+        files: [{ path: "src/diagram-source.ts" }],
       },
     },
     {
@@ -344,6 +370,7 @@ export const broadcastBaselinePatchInput: PatchDocInput = {
         kind: "data",
         delta: "unchanged",
         label: "write results",
+        files: [{ path: "src/diagram-source.ts" }],
       },
     },
     { op: "remove_flow", id: "send-pipeline" },
@@ -353,7 +380,8 @@ export const broadcastBaselinePatchInput: PatchDocInput = {
       op: "update_node",
       id: "broadcast-queue",
       patch: {
-        summary: "Queue documents carry the batch size and suppressed count the sender works from.",
+        summary:
+          "Queue documents carry the batch size and suppressed count the sender works from.",
       },
     },
     {
@@ -376,6 +404,7 @@ export const broadcastBaselinePatchInput: PatchDocInput = {
             label: "enqueue broadcast job",
             kind: "async",
             delta: "unchanged",
+            files: [{ path: "src/diagram-source.ts" }],
           },
           {
             id: "trigger",
@@ -384,6 +413,7 @@ export const broadcastBaselinePatchInput: PatchDocInput = {
             label: "onWrite trigger",
             kind: "async",
             delta: "unchanged",
+            files: [{ path: "src/diagram-source.ts" }],
           },
           {
             id: "suppressions-request",
@@ -392,6 +422,7 @@ export const broadcastBaselinePatchInput: PatchDocInput = {
             label: "GET suppression dump",
             kind: "sync",
             delta: "unchanged",
+            files: [{ path: "src/diagram-source.ts" }],
           },
           {
             id: "suppressions-response",
@@ -400,6 +431,7 @@ export const broadcastBaselinePatchInput: PatchDocInput = {
             label: "suppressed addresses",
             kind: "return",
             delta: "unchanged",
+            files: [{ path: "src/diagram-source.ts" }],
           },
           {
             id: "batch-post",
@@ -409,6 +441,7 @@ export const broadcastBaselinePatchInput: PatchDocInput = {
             kind: "sync",
             delta: "unchanged",
             repeat: 4,
+            files: [{ path: "src/diagram-source.ts" }],
           },
           {
             id: "batch-results",
@@ -417,6 +450,7 @@ export const broadcastBaselinePatchInput: PatchDocInput = {
             label: "per-message results",
             kind: "return",
             delta: "unchanged",
+            files: [{ path: "src/diagram-source.ts" }],
           },
           {
             id: "write-results",
@@ -425,13 +459,16 @@ export const broadcastBaselinePatchInput: PatchDocInput = {
             label: "write results",
             kind: "async",
             delta: "unchanged",
+            files: [{ path: "src/diagram-source.ts" }],
           },
         ],
       },
     },
     {
       op: "set_stats",
-      stats: { chips: [{ label: "Batch size", value: "500", tone: "neutral" }] },
+      stats: {
+        chips: [{ label: "Batch size", value: "500", tone: "neutral" }],
+      },
     },
   ],
 };

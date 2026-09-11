@@ -11,6 +11,7 @@ export {
 } from "./render.js";
 
 export { emptyAtlas, type RenderAtlas } from "./atlas.js";
+export { buildGithubPermalink } from "./source.js";
 
 export { PrLensRenderError, type RenderErrorCode } from "./errors.js";
 
@@ -31,4 +32,9 @@ export {
 
 export { applyCorrections } from "./corrections.js";
 
-export { findView, flattenViews, resolveScope, type ScopedGraph } from "./scope.js";
+export {
+  findView,
+  flattenViews,
+  resolveScope,
+  type ScopedGraph,
+} from "./scope.js";

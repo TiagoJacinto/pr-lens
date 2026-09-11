@@ -1,6 +1,19 @@
 import { z } from "zod";
-import { Flow, GraphEdge, GraphNode, Lane, Stats } from "./graph.js";
-import { FullSha, Id, SchemaVersionField, Summary } from "./primitives.js";
+import {
+  Flow,
+  FlowMessage,
+  GraphEdge,
+  GraphNode,
+  Lane,
+  Stats,
+} from "./graph.js";
+import {
+  FileRef,
+  FullSha,
+  Id,
+  SchemaVersionField,
+  Summary,
+} from "./primitives.js";
 
 /**
  * Update payloads are the element minus its id: a patch never renames the
@@ -9,9 +22,21 @@ import { FullSha, Id, SchemaVersionField, Summary } from "./primitives.js";
  * without clobbering each other.
  */
 export const LanePatch = Lane.omit({ id: true }).partial();
-export const NodePatch = GraphNode.omit({ id: true }).partial();
-export const EdgePatch = GraphEdge.omit({ id: true }).partial();
-export const FlowPatch = Flow.omit({ id: true }).partial();
+export const NodePatch = GraphNode.omit({ id: true, files: true })
+  .partial()
+  .extend({
+    files: z.array(FileRef).min(1).optional(),
+  });
+export const EdgePatch = GraphEdge.omit({ id: true, files: true })
+  .partial()
+  .extend({
+    files: z.array(FileRef).min(1).optional(),
+  });
+export const FlowPatch = Flow.omit({ id: true, messages: true })
+  .partial()
+  .extend({
+    messages: z.array(FlowMessage).min(1).optional(),
+  });
 
 /**
  * Operations that evolve a stored graph — in practice the baseline map, which
@@ -83,7 +108,9 @@ export const PatchDoc = z
     target: z
       .strictObject({
         graphId: Id.describe("Id of the stored graph being patched."),
-        fromSha: FullSha.describe("Commit the stored graph reflects before the operations run."),
+        fromSha: FullSha.describe(
+          "Commit the stored graph reflects before the operations run.",
+        ),
         toSha: FullSha.describe("Commit it reflects once they have."),
       })
       .refine(targetDescribesATransition, {

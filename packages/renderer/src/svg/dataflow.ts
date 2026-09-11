@@ -1,5 +1,10 @@
 import { assertNever } from "@coldtea/pr-lens-schema";
-import type { Flow, FlowMessage, GraphNode, MessageKind } from "@coldtea/pr-lens-schema";
+import type {
+  Flow,
+  FlowMessage,
+  GraphNode,
+  MessageKind,
+} from "@coldtea/pr-lens-schema";
 import { measure } from "../text.js";
 import { coord } from "../geometry.js";
 import type { Box } from "../geometry.js";
@@ -10,7 +15,14 @@ import { messageAttributes, stylesFor } from "./styles.js";
 import { paintCard, paintLabelPill } from "./architecture.js";
 import { atlasBoxes, emptyAtlas, type RenderAtlas } from "../atlas.js";
 import { canvasFor, covering, union, type Canvas } from "../bounds.js";
-import { markerFor, openMarkerFor, shifted, toneColour, toneFor, type Tone } from "./document.js";
+import {
+  markerFor,
+  openMarkerFor,
+  shifted,
+  toneColour,
+  toneFor,
+  type Tone,
+} from "./document.js";
 import {
   DIAGRAM_MARGIN,
   FLOW_CYCLE_MAX,
@@ -40,7 +52,8 @@ import {
 } from "../layout/dataflow.js";
 
 /** A ratio inside the animation cycle, written to a fixed number of places. */
-const ratio = (value: number): string => String(Math.round(value * 10000) / 10000);
+const ratio = (value: number): string =>
+  String(Math.round(value * 10000) / 10000);
 
 /**
  * How long the whole sequence takes. Every step would rather have a full
@@ -51,7 +64,11 @@ const cycleFor = (slotCount: number): number =>
   Math.min(FLOW_CYCLE_MAX, slotCount * FLOW_STEP_TRAVEL);
 
 /** Whether a message crosses to another column, and which way. */
-const travelDirection = (kind: MessageKind, fromX: number, toX: number): -1 | 0 | 1 => {
+const travelDirection = (
+  kind: MessageKind,
+  fromX: number,
+  toX: number,
+): -1 | 0 | 1 => {
   switch (kind) {
     case "self":
       return 0;
@@ -99,7 +116,10 @@ type ActiveAt = (node: string, y: number) => boolean;
 
 const activationLookup = (layout: FlowLayout): ActiveAt => {
   const byNode = new Map(
-    layout.participants.map((participant) => [participant.node.id, participant.activations]),
+    layout.participants.map((participant) => [
+      participant.node.id,
+      participant.activations,
+    ]),
   );
   return (node, y) =>
     (byNode.get(node) ?? []).some((bar) => bar.top <= y && y <= bar.bottom);
@@ -119,11 +139,13 @@ const endsFor = (
 ): Ends => ({
   start:
     placed.fromX +
-    direction * (activeAt(placed.message.from, placed.y) ? ACTIVATION_HALF_WIDTH : 0),
+    direction *
+      (activeAt(placed.message.from, placed.y) ? ACTIVATION_HALF_WIDTH : 0),
   end:
     placed.toX -
     direction *
-      ((activeAt(placed.message.to, placed.y) ? ACTIVATION_HALF_WIDTH : 0) + MARKER_INSET),
+      ((activeAt(placed.message.to, placed.y) ? ACTIVATION_HALF_WIDTH : 0) +
+        MARKER_INSET),
 });
 
 const selfPath = (x: number, y: number, activated: boolean): string => {
@@ -235,7 +257,11 @@ const paintMessage = (
   palette: Palette,
 ): { line: string; pill: string } => {
   const tone = toneFor(placed.message.delta);
-  const direction = travelDirection(placed.message.kind, placed.fromX, placed.toX);
+  const direction = travelDirection(
+    placed.message.kind,
+    placed.fromX,
+    placed.toX,
+  );
   const head = headFor(placed.message.kind, tone);
   const attributes = messageAttributes(placed.message, palette);
 
@@ -244,10 +270,20 @@ const paintMessage = (
     const path = selfPath(placed.fromX, placed.y, activated);
     return {
       line: lines([
-        tag("path", { class: messageClasses(placed.message, tone), d: path, "marker-end": head, ...attributes }),
+        tag("path", {
+          class: messageClasses(placed.message, tone),
+          d: path,
+          "marker-end": head,
+          ...attributes,
+        }),
         pulsesFor(placed, path, slotCount, palette),
       ]),
-      pill: paintLabelPill(placed.label, selfPillBox(placed, activated), tone, palette),
+      pill: paintLabelPill(
+        placed.label,
+        selfPillBox(placed, activated),
+        tone,
+        palette,
+      ),
     };
   }
 
@@ -256,7 +292,12 @@ const paintMessage = (
 
   return {
     line: lines([
-      tag("path", { class: messageClasses(placed.message, tone), d: path, "marker-end": head, ...attributes }),
+      tag("path", {
+        class: messageClasses(placed.message, tone),
+        d: path,
+        "marker-end": head,
+        ...attributes,
+      }),
       pulsesFor(placed, path, slotCount, palette),
     ]),
     pill: paintLabelPill(placed.label, pillBox(placed, ends), tone, palette),
@@ -268,7 +309,11 @@ const paintMessage = (
  * card, its lifeline and its activation bars with the same breathing room a
  * lane keeps around its cards.
  */
-const bandBox = (centreX: number, columnWidth: number, layout: FlowLayout): Box => {
+const bandBox = (
+  centreX: number,
+  columnWidth: number,
+  layout: FlowLayout,
+): Box => {
   const top = layout.top + PARTICIPANT_TOP - FLOW_BAND_PAD_Y;
   return {
     x: centreX - columnWidth / 2 - FLOW_BAND_PAD_X,
@@ -371,9 +416,14 @@ const flowBounds = (layout: FlowLayout, columnWidth: number): Box[] => {
   );
 
   const pills = layout.messages.map((placed) => {
-    const direction = travelDirection(placed.message.kind, placed.fromX, placed.toX);
+    const direction = travelDirection(
+      placed.message.kind,
+      placed.fromX,
+      placed.toX,
+    );
 
-    if (direction === 0) return selfPillBox(placed, activeAt(placed.message.from, placed.y));
+    if (direction === 0)
+      return selfPillBox(placed, activeAt(placed.message.from, placed.y));
     return pillBox(placed, endsFor(placed, activeAt, direction));
   });
 
@@ -399,12 +449,19 @@ const flowBounds = (layout: FlowLayout, columnWidth: number): Box[] => {
  * a step lit without its own words is a step a reader cannot name.
  */
 const messageBox = (placed: PlacedMessage, activeAt: ActiveAt): Box => {
-  const direction = travelDirection(placed.message.kind, placed.fromX, placed.toX);
+  const direction = travelDirection(
+    placed.message.kind,
+    placed.fromX,
+    placed.toX,
+  );
 
   const drawn =
     direction === 0
       ? selfDrawn(placed, activeAt(placed.message.from, placed.y))
-      : covering(straightDrawn(placed), pillBox(placed, endsFor(placed, activeAt, direction)));
+      : covering(
+          straightDrawn(placed),
+          pillBox(placed, endsFor(placed, activeAt, direction)),
+        );
 
   const pitch = messagePitch(placed.message);
   return {
@@ -428,7 +485,9 @@ const selfDrawn = (placed: PlacedMessage, activated: boolean): Box =>
       x: placed.fromX,
       y: placed.y,
       width:
-        (activated ? ACTIVATION_HALF_WIDTH : 0) + SELF_LOOP_REACH + SELF_LOOP_CORNER,
+        (activated ? ACTIVATION_HALF_WIDTH : 0) +
+        SELF_LOOP_REACH +
+        SELF_LOOP_CORNER,
       height: SELF_LOOP_EXTENT,
     },
     selfPillBox(placed, activated),
@@ -491,6 +550,25 @@ export const paintDataFlow = (
       messages: Object.fromEntries(
         layout.flows.map((flow) => [flow.flow.id, flowAtlas(flow, canvas)]),
       ),
+      sources: {
+        nodes: Object.fromEntries(
+          layout.flows.flatMap((flow) =>
+            flow.participants.map((participant) => [
+              participant.node.id,
+              participant.node.files,
+            ]),
+          ),
+        ),
+        edges: {},
+        messages: Object.fromEntries(
+          layout.flows.map((flow) => [
+            flow.flow.id,
+            Object.fromEntries(
+              flow.flow.messages.map((message) => [message.id, message.files]),
+            ),
+          ]),
+        ),
+      },
     },
   };
 };

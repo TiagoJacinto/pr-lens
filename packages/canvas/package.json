@@ -1,0 +1,27 @@
+{
+  "name": "@tiagojacinto/pr-lens-canvas",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "deploy": "pnpm build && wrangler deploy"
+  },
+  "dependencies": {
+    "@coldtea/pr-lens-renderer": "workspace:*",
+    "@coldtea/pr-lens-schema": "workspace:*",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20260911.1",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "5.1.4",
+    "vite": "7.1.7",
+    "vitest": "4.1.11",
+    "wrangler": "4.131.0"
+  }
+}

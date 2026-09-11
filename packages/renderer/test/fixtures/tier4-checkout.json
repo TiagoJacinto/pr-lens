@@ -1,7 +1,7 @@
 {
   "schemaVersion": "0.1.0",
   "kind": "graph",
-  "title": "Tier 4 — checkout platform",
+  "title": "Tier 4 \u2014 checkout platform",
   "summary": "Five lanes, cross-lane conversations, bidirectional pairs, a retired charge path.",
   "lenses": [
     "architecture"
@@ -53,7 +53,7 @@
       "kind": "ui",
       "delta": "unchanged",
       "lane": "web",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -62,7 +62,7 @@
       "kind": "ui",
       "delta": "modified",
       "lane": "web",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -71,7 +71,7 @@
       "kind": "ui",
       "delta": "unchanged",
       "lane": "web",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -80,7 +80,7 @@
       "kind": "ui",
       "delta": "added",
       "lane": "web",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -89,7 +89,7 @@
       "kind": "route",
       "delta": "modified",
       "lane": "api",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -98,7 +98,7 @@
       "kind": "function",
       "delta": "added",
       "lane": "api",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -107,7 +107,7 @@
       "kind": "route",
       "delta": "modified",
       "lane": "api",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -116,7 +116,7 @@
       "kind": "function",
       "delta": "unchanged",
       "lane": "api",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -125,7 +125,7 @@
       "kind": "route",
       "delta": "removed",
       "lane": "api",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -134,7 +134,7 @@
       "kind": "job",
       "delta": "added",
       "lane": "workers",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -143,7 +143,7 @@
       "kind": "job",
       "delta": "modified",
       "lane": "workers",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -152,7 +152,7 @@
       "kind": "job",
       "delta": "unchanged",
       "lane": "workers",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -162,7 +162,7 @@
       "delta": "added",
       "lane": "workers",
       "subtitle": "cron",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -171,7 +171,7 @@
       "kind": "job",
       "delta": "removed",
       "lane": "workers",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -181,7 +181,7 @@
       "delta": "modified",
       "lane": "data",
       "subtitle": "Postgres",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -190,7 +190,7 @@
       "kind": "datastore",
       "delta": "added",
       "lane": "data",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -199,7 +199,7 @@
       "kind": "datastore",
       "delta": "added",
       "lane": "data",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -209,7 +209,7 @@
       "delta": "unchanged",
       "lane": "data",
       "subtitle": "Redis",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -218,7 +218,7 @@
       "kind": "external",
       "delta": "modified",
       "lane": "external",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -227,7 +227,7 @@
       "kind": "external",
       "delta": "added",
       "lane": "external",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     },
     {
@@ -236,7 +236,7 @@
       "kind": "external",
       "delta": "unchanged",
       "lane": "external",
-      "files": [],
+      "files": [{"path":"test/fixture.ts","revision":"head"}],
       "badges": []
     }
   ],
@@ -250,7 +250,7 @@
       "label": "begin checkout",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "checkout-to-route",
@@ -261,7 +261,7 @@
       "label": "POST /checkout",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "account-to-session",
@@ -271,7 +271,7 @@
       "delta": "unchanged",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "session-to-cache",
@@ -282,7 +282,7 @@
       "label": "session lookup",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "route-to-intent",
@@ -293,7 +293,7 @@
       "label": "create intent",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "intent-to-stripe",
@@ -304,7 +304,7 @@
       "label": "PaymentIntent API",
       "emphasis": "hero",
       "animated": true,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "intent-to-tax",
@@ -315,7 +315,7 @@
       "label": "quote tax",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "route-to-orders",
@@ -326,7 +326,7 @@
       "label": "write order",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "stripe-to-console",
@@ -337,7 +337,7 @@
       "label": "webhook events",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "scheduler-to-capture",
@@ -347,7 +347,7 @@
       "delta": "added",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "scheduler-to-refund",
@@ -357,7 +357,7 @@
       "delta": "added",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "capture-to-stripe",
@@ -368,7 +368,7 @@
       "label": "capture",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "capture-to-ledger",
@@ -379,7 +379,7 @@
       "label": "post entry",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "capture-to-outbox",
@@ -389,7 +389,7 @@
       "delta": "added",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "capture-to-orders",
@@ -400,7 +400,7 @@
       "label": "update status",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "orders-to-capture",
@@ -411,7 +411,7 @@
       "label": "order snapshot",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "refund-to-worker",
@@ -422,7 +422,7 @@
       "label": "enqueue refund",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "refund-to-stripe",
@@ -433,7 +433,7 @@
       "label": "refund API",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "refund-to-orders",
@@ -444,7 +444,7 @@
       "label": "mark refunded",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "outbox-to-email",
@@ -455,7 +455,7 @@
       "label": "outbox poll",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "email-to-mailgun",
@@ -466,7 +466,7 @@
       "label": "send receipt",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "route-to-legacy",
@@ -477,7 +477,7 @@
       "label": "direct charge (was)",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "legacy-to-cron",
@@ -488,7 +488,7 @@
       "label": "capture later (was)",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     },
     {
       "id": "cron-to-stripe",
@@ -499,7 +499,7 @@
       "label": "charge capture (was)",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [{"path":"test/fixture.ts","revision":"head"}]
     }
   ],
   "flows": [],

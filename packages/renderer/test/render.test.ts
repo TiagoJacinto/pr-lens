@@ -12,7 +12,11 @@ import { expectGolden } from "./goldens.js";
 describe("golden renders", () => {
   for (const theme of THEMES) {
     it(`draws the reference pull request in the architecture lens, ${theme}`, () => {
-      const { svg } = render(postmarkRefactorGraph, { lens: "architecture", theme, view: "overview" });
+      const { svg } = render(postmarkRefactorGraph, {
+        lens: "architecture",
+        theme,
+        view: "overview",
+      });
       expectGolden(`postmark-refactor.architecture.${theme}.svg`, svg);
     });
 
@@ -36,12 +40,18 @@ describe("golden renders", () => {
   });
 
   it("draws a diagram where nothing changed", () => {
-    const { svg } = render(broadcastBaselineGraph, { lens: "architecture", theme: "dark" });
+    const { svg } = render(broadcastBaselineGraph, {
+      lens: "architecture",
+      theme: "dark",
+    });
     expectGolden("broadcast-baseline.architecture.dark.svg", svg);
   });
 
   it("draws a single node", () => {
-    const { svg } = render(minimalGraph, { lens: "architecture", theme: "light" });
+    const { svg } = render(minimalGraph, {
+      lens: "architecture",
+      theme: "light",
+    });
     expectGolden("minimal.architecture.light.svg", svg);
   });
 
@@ -57,10 +67,16 @@ describe("golden renders", () => {
 });
 
 describe("the rendered document", () => {
-  const { svg } = render(postmarkRefactorGraph, { lens: "architecture", theme: "dark" });
+  const { svg } = render(postmarkRefactorGraph, {
+    lens: "architecture",
+    theme: "dark",
+  });
 
   it.each(THEMES)("does not depend on CSS in either lens, %s", (theme) => {
-    const { assets } = renderAll({ ...postmarkRefactorGraph, views: [] }, { themes: [theme] });
+    const { assets } = renderAll(
+      { ...postmarkRefactorGraph, views: [] },
+      { themes: [theme] },
+    );
 
     for (const { svg: drawn } of assets) {
       expect(drawn).not.toMatch(/<style\b|\sstyle\s*=/i);
@@ -76,7 +92,9 @@ describe("the rendered document", () => {
     expect(svg).not.toMatch(/href/i);
     expect(svg).not.toMatch(/@import|url\(\s*['"]?https?:/i);
     expect(svg).not.toMatch(/var\(--/);
-    expect(svg.match(/https?:\/\/[^"]*/g)).toEqual(["http://www.w3.org/2000/svg"]);
+    expect(svg.match(/https?:\/\/[^"]*/g)).toEqual([
+      "http://www.w3.org/2000/svg",
+    ]);
   });
 
   it("animates with SMIL rather than script", () => {
@@ -84,7 +102,9 @@ describe("the rendered document", () => {
   });
 
   it("declares its own size", () => {
-    expect(svg).toMatch(/^<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg" viewBox="0 0 \d/);
+    expect(svg).toMatch(
+      /^<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg" viewBox="0 0 \d/,
+    );
   });
 
   it("escapes text that would otherwise close a tag", () => {
@@ -103,26 +123,35 @@ describe("the rendered document", () => {
 
 describe("refusals", () => {
   it("names a view it cannot find", () => {
-    expect(() => render(postmarkRefactorGraph, { lens: "architecture", theme: "dark", view: "nope" }))
-      .toThrowError(expect.objectContaining({ code: "UNKNOWN_VIEW" }));
+    expect(() =>
+      render(postmarkRefactorGraph, {
+        lens: "architecture",
+        theme: "dark",
+        view: "nope",
+      }),
+    ).toThrowError(expect.objectContaining({ code: "UNKNOWN_VIEW" }));
   });
 
   it("refuses a lens the document does not declare", () => {
-    expect(() => render(minimalGraph, { lens: "data-flow", theme: "dark" })).toThrowError(
-      expect.objectContaining({ code: "LENS_NOT_DECLARED" }),
-    );
+    expect(() =>
+      render(minimalGraph, { lens: "data-flow", theme: "dark" }),
+    ).toThrowError(expect.objectContaining({ code: "LENS_NOT_DECLARED" }));
   });
 
   it("refuses the data-flow lens with no flow in scope", () => {
     expect(() =>
-      render(postmarkRefactorGraph, { lens: "data-flow", theme: "dark", view: "new-batch-path" }),
+      render(postmarkRefactorGraph, {
+        lens: "data-flow",
+        theme: "dark",
+        view: "new-batch-path",
+      }),
     ).toThrowError(expect.objectContaining({ code: "NO_FLOW_IN_SCOPE" }));
   });
 
   it("throws the renderer's own error type", () => {
-    expect(() => render(minimalGraph, { lens: "data-flow", theme: "dark" })).toThrowError(
-      PrLensRenderError,
-    );
+    expect(() =>
+      render(minimalGraph, { lens: "data-flow", theme: "dark" }),
+    ).toThrowError(PrLensRenderError);
   });
 });
 
@@ -165,11 +194,16 @@ describe("renderAll", () => {
       views: [],
       flows: [],
     });
-    expect(bare.map(({ asset }) => asset.lens)).toEqual(["architecture", "architecture"]);
+    expect(bare.map(({ asset }) => asset.lens)).toEqual([
+      "architecture",
+      "architecture",
+    ]);
   });
 
   it("produces a manifest the contract accepts", () => {
-    expect(() => parseRenderManifest(JSON.parse(JSON.stringify(manifest)))).not.toThrow();
+    expect(() =>
+      parseRenderManifest(JSON.parse(JSON.stringify(manifest))),
+    ).not.toThrow();
     expect(manifest.graph.contentHash).toMatch(/^[0-9a-f]{32}$/);
     expect(manifest.assets).toHaveLength(assets.length);
   });

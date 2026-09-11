@@ -58,7 +58,8 @@
       "subtitle": "app/broadcasts/new",
       "files": [
         {
-          "path": "app/broadcasts/new/page.tsx"
+          "path": "app/broadcasts/new/page.tsx",
+          "revision": "head"
         }
       ],
       "badges": []
@@ -71,7 +72,8 @@
       "lane": "web",
       "files": [
         {
-          "path": "app/api/broadcasts/queue/route.ts"
+          "path": "app/api/broadcasts/queue/route.ts",
+          "revision": "head"
         }
       ],
       "badges": []
@@ -85,7 +87,8 @@
       "subtitle": "Firestore collection",
       "files": [
         {
-          "path": "functions/src/broadcast/schema.ts"
+          "path": "functions/src/broadcast/schema.ts",
+          "revision": "head"
         }
       ],
       "badges": []
@@ -100,7 +103,8 @@
       "summary": "Walks the recipient list and sends one message at a time.",
       "files": [
         {
-          "path": "functions/src/broadcast/processBroadcast.ts"
+          "path": "functions/src/broadcast/processBroadcast.ts",
+          "revision": "head"
         }
       ],
       "badges": []
@@ -113,7 +117,8 @@
       "lane": "functions",
       "files": [
         {
-          "path": "functions/src/broadcast/sendSingleEmail.ts"
+          "path": "functions/src/broadcast/sendSingleEmail.ts",
+          "revision": "head"
         }
       ],
       "badges": []
@@ -125,7 +130,12 @@
       "delta": "unchanged",
       "lane": "external",
       "subtitle": "Email API",
-      "files": [],
+      "files": [
+        {
+          "path": "functions/src/broadcast/sendSingleEmail.ts",
+          "revision": "head"
+        }
+      ],
       "badges": []
     }
   ],
@@ -139,7 +149,12 @@
       "label": "send broadcast",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [
+        {
+          "path": "src/diagram-source.ts",
+          "revision": "head"
+        }
+      ]
     },
     {
       "id": "queue-to-firestore",
@@ -150,7 +165,12 @@
       "label": "enqueue job",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [
+        {
+          "path": "src/diagram-source.ts",
+          "revision": "head"
+        }
+      ]
     },
     {
       "id": "firestore-to-process",
@@ -161,7 +181,12 @@
       "label": "onWrite",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [
+        {
+          "path": "src/diagram-source.ts",
+          "revision": "head"
+        }
+      ]
     },
     {
       "id": "process-to-single",
@@ -172,7 +197,12 @@
       "label": "per recipient",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [
+        {
+          "path": "src/diagram-source.ts",
+          "revision": "head"
+        }
+      ]
     },
     {
       "id": "single-to-postmark",
@@ -183,7 +213,12 @@
       "label": "POST /email · 1 msg/call",
       "emphasis": "normal",
       "animated": false,
-      "files": []
+      "files": [
+        {
+          "path": "src/diagram-source.ts",
+          "revision": "head"
+        }
+      ]
     }
   ],
   "flows": [
@@ -218,7 +253,12 @@
           "kind": "async",
           "delta": "unchanged",
           "animated": true,
-          "files": []
+          "files": [
+            {
+              "path": "src/diagram-source.ts",
+              "revision": "head"
+            }
+          ]
         },
         {
           "id": "trigger",
@@ -228,7 +268,12 @@
           "kind": "async",
           "delta": "unchanged",
           "animated": true,
-          "files": []
+          "files": [
+            {
+              "path": "src/diagram-source.ts",
+              "revision": "head"
+            }
+          ]
         },
         {
           "id": "single-post",
@@ -240,7 +285,12 @@
           "animated": true,
           "repeat": 2000,
           "note": "One request per recipient.",
-          "files": []
+          "files": [
+            {
+              "path": "src/diagram-source.ts",
+              "revision": "head"
+            }
+          ]
         },
         {
           "id": "single-result",
@@ -250,7 +300,12 @@
           "kind": "return",
           "delta": "unchanged",
           "animated": true,
-          "files": []
+          "files": [
+            {
+              "path": "src/diagram-source.ts",
+              "revision": "head"
+            }
+          ]
         },
         {
           "id": "write-result",
@@ -261,7 +316,12 @@
           "delta": "unchanged",
           "animated": true,
           "repeat": 2000,
-          "files": []
+          "files": [
+            {
+              "path": "src/diagram-source.ts",
+              "revision": "head"
+            }
+          ]
         }
       ]
     }

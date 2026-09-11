@@ -1,3 +1,4 @@
+import type { FileRef } from "@coldtea/pr-lens-schema";
 import { covering, type Canvas } from "./bounds.js";
 import { roundCoord, type Box } from "./geometry.js";
 
@@ -12,15 +13,26 @@ import { roundCoord, type Box } from "./geometry.js";
  * than being measured back out of it by something that would have to guess.
  */
 export type RenderAtlas = {
-  lanes: Record<string, Box>;
-  nodes: Record<string, Box>;
-  edges: Record<string, Box>;
-  /** Keyed by flow, then by step: a flow step's id is unique only inside its own flow. */
-  messages: Record<string, Record<string, Box>>;
+ lanes: Record<string, Box>;
+ nodes: Record<string, Box>;
+ edges: Record<string, Box>;
+ /** Keyed by flow, then by step: a flow step's id is unique only inside its own flow. */
+ messages: Record<string, Record<string, Box>>;
+ sources: {
+  nodes: Record<string, readonly FileRef[]>;
+  edges: Record<string, readonly FileRef[]>;
+  messages: Record<string, Record<string, readonly FileRef[]>>;
+ };
 };
 
 /** An atlas for a drawing that has placed nothing. */
-export const emptyAtlas = (): RenderAtlas => ({ lanes: {}, nodes: {}, edges: {}, messages: {} });
+export const emptyAtlas = (): RenderAtlas => ({
+ lanes: {},
+ nodes: {},
+ edges: {},
+ messages: {},
+ sources: { nodes: {}, edges: {}, messages: {} },
+});
 
 export type AtlasEntry = { id: string; box: Box };
 
@@ -35,22 +47,22 @@ export type AtlasEntry = { id: string; box: Box };
  * them.
  */
 export const atlasBoxes = (
-  entries: readonly AtlasEntry[],
-  canvas: Canvas,
+ entries: readonly AtlasEntry[],
+ canvas: Canvas,
 ): Record<string, Box> => {
-  const grown = new Map<string, Box>();
-  for (const { id, box } of entries) {
-    const current = grown.get(id);
-    grown.set(id, current === undefined ? box : covering(current, box));
-  }
+ const grown = new Map<string, Box>();
+ for (const { id, box } of entries) {
+  const current = grown.get(id);
+  grown.set(id, current === undefined ? box : covering(current, box));
+ }
 
-  const boxes: Record<string, Box> = {};
-  for (const [id, box] of grown)
-    boxes[id] = {
-      x: roundCoord(box.x + canvas.shiftX),
-      y: roundCoord(box.y + canvas.shiftY),
-      width: roundCoord(box.width),
-      height: roundCoord(box.height),
-    };
-  return boxes;
+ const boxes: Record<string, Box> = {};
+ for (const [id, box] of grown)
+  boxes[id] = {
+   x: roundCoord(box.x + canvas.shiftX),
+   y: roundCoord(box.y + canvas.shiftY),
+   width: roundCoord(box.width),
+   height: roundCoord(box.height),
+  };
+ return boxes;
 };

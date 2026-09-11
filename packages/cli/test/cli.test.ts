@@ -10,7 +10,10 @@ import { GRAPH_DOCUMENT_JSON_SCHEMA } from "../src/skill-content.generated.js";
 import type { Terminal } from "../src/terminal.js";
 import { CLI_VERSION } from "../src/version.js";
 
-const GOLDEN = new URL("../../schema/examples/postmark-refactor.graph.json", import.meta.url).pathname;
+const GOLDEN = new URL(
+  "../../schema/examples/postmark-refactor.graph.json",
+  import.meta.url,
+).pathname;
 const CLI_INVOCATION = "npx @coldtea/pr-lens-cli@latest";
 
 const forBundledCli = (content: string): string =>
@@ -18,7 +21,10 @@ const forBundledCli = (content: string): string =>
 
 let out: string[] = [];
 let err: string[] = [];
-const terminal: Terminal = { out: (line) => out.push(line), err: (line) => err.push(line) };
+const terminal: Terminal = {
+  out: (line) => out.push(line),
+  err: (line) => err.push(line),
+};
 
 const invoke = (...argv: string[]) => run(argv, terminal, {});
 
@@ -61,7 +67,9 @@ test("skill help makes its agent-facing output clear", async () => {
   expect(out.join("\n")).toContain("share PR Lens diagrams");
   expect(out.join("\n")).toContain("written to stdout");
   expect(out.join("\n")).toContain("long, agent-facing document");
-  expect(out.join("\n")).toContain("Use pr-lens --help for a short command overview");
+  expect(out.join("\n")).toContain(
+    "Use pr-lens --help for a short command overview",
+  );
 });
 
 test("skill references prints the config, graph specification, and example", async () => {
@@ -128,7 +136,9 @@ test("a walkthrough step focusing a flow step its stage never draws is caught", 
   expect(await invoke("validate", path)).toBe(1);
   const reported = err.join("\n");
   expect(reported).toContain("[BROKEN_REFERENCE]");
-  expect(reported).toContain("focuses 'no-such-step', which no flow on its stage carries");
+  expect(reported).toContain(
+    "focuses 'no-such-step', which no flow on its stage carries",
+  );
 });
 
 test("a walkthrough step with a heading and nothing under it is caught", async () => {
@@ -152,10 +162,32 @@ test("an invalid document fails with every problem, not only the first", async (
       kind: "graph",
       title: "Broken",
       lenses: ["architecture"],
-      provenance: { repo: { owner: "o", name: "r" }, base: { sha: "1111111" }, head: { sha: "2222222" } },
+      provenance: {
+        repo: { owner: "o", name: "r" },
+        base: { sha: "1111111" },
+        head: { sha: "2222222" },
+      },
       lanes: [{ id: "api", label: "API" }],
-      nodes: [{ id: "a", label: "A", kind: "route", delta: "added", lane: "nowhere" }],
-      edges: [{ id: "e", from: "a", to: "ghost", kind: "call", delta: "added" }],
+      nodes: [
+        {
+          id: "a",
+          label: "A",
+          kind: "route",
+          delta: "added",
+          lane: "nowhere",
+          files: [{ path: "src/a.ts", revision: "head" }],
+        },
+      ],
+      edges: [
+        {
+          id: "e",
+          from: "a",
+          to: "ghost",
+          kind: "call",
+          delta: "added",
+          files: [{ path: "src/a.ts", revision: "head" }],
+        },
+      ],
     }),
     "utf8",
   );
@@ -186,9 +218,13 @@ test("the marker is printed by the CLI that owns it, so nothing else has to spel
 test("rendering writes every SVG the manifest promises, and the manifest validates", async () => {
   const directory = await mkdtemp(join(tmpdir(), "pr-lens-render-"));
 
-  expect(await invoke("render", GOLDEN, "--out", directory, "--no-config")).toBe(0);
+  expect(
+    await invoke("render", GOLDEN, "--out", directory, "--no-config"),
+  ).toBe(0);
 
-  const manifest = parseRenderManifest(JSON.parse(await readFile(join(directory, "manifest.json"), "utf8")));
+  const manifest = parseRenderManifest(
+    JSON.parse(await readFile(join(directory, "manifest.json"), "utf8")),
+  );
   expect(manifest.assets.length).toBeGreaterThan(0);
 
   for (const asset of manifest.assets) {
@@ -202,9 +238,21 @@ test("rendering writes every SVG the manifest promises, and the manifest validat
 test("--theme draws one half of the pair, and nothing else", async () => {
   const directory = await mkdtemp(join(tmpdir(), "pr-lens-render-"));
 
-  expect(await invoke("render", GOLDEN, "--out", directory, "--theme", "dark", "--no-config")).toBe(0);
+  expect(
+    await invoke(
+      "render",
+      GOLDEN,
+      "--out",
+      directory,
+      "--theme",
+      "dark",
+      "--no-config",
+    ),
+  ).toBe(0);
 
-  const manifest = parseRenderManifest(JSON.parse(await readFile(join(directory, "manifest.json"), "utf8")));
+  const manifest = parseRenderManifest(
+    JSON.parse(await readFile(join(directory, "manifest.json"), "utf8")),
+  );
   expect(manifest.assets.every((asset) => asset.theme === "dark")).toBe(true);
 });
 
@@ -226,10 +274,16 @@ test("a comment never announces a section the corrections stopped the render fro
   const config = join(directory, "pr-lens.yml");
   await writeFile(config, CORRECTIONS, "utf8");
 
-  expect(await invoke("render", GOLDEN, "--out", directory, "--config", config)).toBe(0);
+  expect(
+    await invoke("render", GOLDEN, "--out", directory, "--config", config),
+  ).toBe(0);
 
-  const manifest = parseRenderManifest(JSON.parse(await readFile(join(directory, "manifest.json"), "utf8")));
-  expect(manifest.assets.some((asset) => asset.view === "retired-path")).toBe(false);
+  const manifest = parseRenderManifest(
+    JSON.parse(await readFile(join(directory, "manifest.json"), "utf8")),
+  );
+  expect(manifest.assets.some((asset) => asset.view === "retired-path")).toBe(
+    false,
+  );
 
   out = [];
   expect(
@@ -252,7 +306,9 @@ test("the document that was read cannot stand in for the document that was drawn
   const config = join(directory, "pr-lens.yml");
   await writeFile(config, CORRECTIONS, "utf8");
 
-  expect(await invoke("render", GOLDEN, "--out", directory, "--config", config)).toBe(0);
+  expect(
+    await invoke("render", GOLDEN, "--out", directory, "--config", config),
+  ).toBe(0);
   err = [];
 
   expect(
@@ -275,10 +331,14 @@ test("a correction that matches nothing is said out loud", async () => {
   const config = join(directory, "pr-lens.yml");
   await writeFile(config, CORRECTIONS, "utf8");
 
-  expect(await invoke("render", GOLDEN, "--out", directory, "--config", config)).toBe(0);
+  expect(
+    await invoke("render", GOLDEN, "--out", directory, "--config", config),
+  ).toBe(0);
 
   const reported = err.join("\n");
-  expect(reported).toContain("exclude 'src/nothing-is-here.ts' changed nothing");
+  expect(reported).toContain(
+    "exclude 'src/nothing-is-here.ts' changed nothing",
+  );
   expect(reported).not.toContain("id:process-broadcast");
 });
 
@@ -287,10 +347,16 @@ test("the drawn document and the manifest are bound to each other", async () => 
   const config = join(directory, "pr-lens.yml");
   await writeFile(config, CORRECTIONS, "utf8");
 
-  expect(await invoke("render", GOLDEN, "--out", directory, "--config", config)).toBe(0);
+  expect(
+    await invoke("render", GOLDEN, "--out", directory, "--config", config),
+  ).toBe(0);
 
-  const drawn = parseGraphDoc(JSON.parse(await readFile(join(directory, "drawn.graph.json"), "utf8")));
-  const manifest = parseRenderManifest(JSON.parse(await readFile(join(directory, "manifest.json"), "utf8")));
+  const drawn = parseGraphDoc(
+    JSON.parse(await readFile(join(directory, "drawn.graph.json"), "utf8")),
+  );
+  const manifest = parseRenderManifest(
+    JSON.parse(await readFile(join(directory, "manifest.json"), "utf8")),
+  );
 
   expect(graphContentHash(drawn)).toBe(manifest.graph.contentHash);
   expect(drawn.nodes.map((node) => node.id)).not.toContain("process-broadcast");
@@ -299,7 +365,9 @@ test("the drawn document and the manifest are bound to each other", async () => 
 test("render and comment agree on where the SVGs are, without either deriving the other's names", async () => {
   const directory = await mkdtemp(join(tmpdir(), "pr-lens-render-"));
 
-  expect(await invoke("render", GOLDEN, "--out", directory, "--no-config")).toBe(0);
+  expect(
+    await invoke("render", GOLDEN, "--out", directory, "--no-config"),
+  ).toBe(0);
   out = [];
 
   expect(
@@ -315,9 +383,13 @@ test("render and comment agree on where the SVGs are, without either deriving th
   ).toBe(0);
 
   const body = out.join("\n");
-  const manifest = parseRenderManifest(JSON.parse(await readFile(join(directory, "manifest.json"), "utf8")));
+  const manifest = parseRenderManifest(
+    JSON.parse(await readFile(join(directory, "manifest.json"), "utf8")),
+  );
 
   for (const asset of manifest.assets) {
-    expect(body).toContain(`https://raw.githubusercontent.com/o/r/pr-lens/42/${asset.path}`);
+    expect(body).toContain(
+      `https://raw.githubusercontent.com/o/r/pr-lens/42/${asset.path}`,
+    );
   }
 });

@@ -1,5 +1,9 @@
 import { assertNever } from "@coldtea/pr-lens-schema";
-import type { GraphEdge, GraphNode, LayoutHints } from "@coldtea/pr-lens-schema";
+import type {
+  GraphEdge,
+  GraphNode,
+  LayoutHints,
+} from "@coldtea/pr-lens-schema";
 import { truncate } from "../text.js";
 import { glyphGroup } from "./icons.js";
 import type { Palette } from "../theme.js";
@@ -13,7 +17,13 @@ import { relieveCongestion } from "../layout/congestion.js";
 import { lines, tag, textNode, wrap } from "./primitives.js";
 import { curveBounds, type RoutedEdge } from "../layout/edges.js";
 import { atlasBoxes, emptyAtlas, type RenderAtlas } from "../atlas.js";
-import { markerFor, shifted, toneColour, toneFor, type Tone } from "./document.js";
+import {
+  markerFor,
+  shifted,
+  toneColour,
+  toneFor,
+  type Tone,
+} from "./document.js";
 import {
   badgeColours,
   cardAttributes,
@@ -108,7 +118,8 @@ const cardOutlineClass = (node: GraphNode): string => {
 export const paintCard = (placed: PlacedNode, palette: Palette): string => {
   const styles = stylesFor(palette);
   const { node, box, showIcon, titleSize } = placed;
-  const textX = box.x + CARD_PADDING_X + (showIcon ? ICON_CHIP_SIZE + ICON_CHIP_GAP : 0);
+  const textX =
+    box.x + CARD_PADDING_X + (showIcon ? ICON_CHIP_SIZE + ICON_CHIP_GAP : 0);
   const textWidth = cardTextWidth(box.width, showIcon);
   const hasSubtitle = node.subtitle !== undefined;
   const titleBaseline = box.y + (hasSubtitle ? 27 : 31);
@@ -147,12 +158,21 @@ export const paintCard = (placed: PlacedNode, palette: Palette): string => {
     node.subtitle === undefined
       ? ""
       : textNode(
-          { class: "nsub", x: coord(textX), y: coord(box.y + 45), ...styles.subtitle },
+          {
+            class: "nsub",
+            x: coord(textX),
+            y: coord(box.y + 45),
+            ...styles.subtitle,
+          },
           truncate(node.subtitle, "mono", SUBTITLE_SIZE, textWidth),
         );
 
   const groupClass =
-    node.delta === "removed" ? "cardsh ghost" : node.delta === "unchanged" ? "cardsh context" : "cardsh";
+    node.delta === "removed"
+      ? "cardsh ghost"
+      : node.delta === "unchanged"
+        ? "cardsh context"
+        : "cardsh";
 
   return wrap(
     "g",
@@ -211,13 +231,23 @@ const paintEdge = (
   if (edge.delta === "unchanged") classes.push("context");
 
   const glow = hero
-    ? tag("path", { class: "glow", stroke: toneColour(palette, tone), d: path, ...styles.glow })
+    ? tag("path", {
+        class: "glow",
+        stroke: toneColour(palette, tone),
+        d: path,
+        ...styles.glow,
+      })
     : "";
 
   return {
     markup: lines([
       glow,
-      tag("path", { class: classes.join(" "), d: path, "marker-end": markerFor(tone), ...edgeAttributes(edge, palette) }),
+      tag("path", {
+        class: classes.join(" "),
+        d: path,
+        "marker-end": markerFor(tone),
+        ...edgeAttributes(edge, palette),
+      }),
       pulses(edge, path, palette),
     ]),
     pill:
@@ -227,7 +257,12 @@ const paintEdge = (
   };
 };
 
-export const paintLabelPill = (text: string, box: Box, tone: Tone, palette: Palette): string => {
+export const paintLabelPill = (
+  text: string,
+  box: Box,
+  tone: Tone,
+  palette: Palette,
+): string => {
   const styles = stylesFor(palette);
   return wrap(
     "g",
@@ -297,7 +332,12 @@ export const paintArchitecture = (
         ...styles.lane,
       }),
       textNode(
-        { class: "lanelabel", x: coord(box.x + LANE_PADDING_X), y: LANE_HEADER_BASELINE, ...styles.laneLabel },
+        {
+          class: "lanelabel",
+          x: coord(box.x + LANE_PADDING_X),
+          y: LANE_HEADER_BASELINE,
+          ...styles.laneLabel,
+        },
         laneHeaderText(lane),
       ),
     ]),
@@ -336,9 +376,21 @@ export const paintArchitecture = (
         canvas,
       ),
       edges: atlasBoxes(
-        routed.map(({ edge, curve }) => ({ id: edge.id, box: curveBounds(curve) })),
+        routed.map(({ edge, curve }) => ({
+          id: edge.id,
+          box: curveBounds(curve),
+        })),
         canvas,
       ),
+      sources: {
+        nodes: Object.fromEntries(
+          layout.nodes.map(({ node }) => [node.id, node.files]),
+        ),
+        edges: Object.fromEntries(
+          routed.map(({ edge }) => [edge.id, edge.files]),
+        ),
+        messages: {},
+      },
     },
   };
 };

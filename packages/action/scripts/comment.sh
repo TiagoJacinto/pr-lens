@@ -5,9 +5,10 @@ set -euo pipefail
 
 WORK="${RUNNER_TEMP}/pr-lens"
 BODY="${WORK}/comment.md"
+ACTION_PATH="${ACTION_PATH:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 
 cli() {
-  npx --yes "@coldtea/pr-lens-cli@${CLI_VERSION}" "$@"
+  bash "${ACTION_PATH}/scripts/run-cli.sh" "$@"
 }
 
 # Whether this run still describes the pull request as it stands. A run that
@@ -55,6 +56,10 @@ cli comment \
   --asset-base-url "${ASSETS_URL}" \
   ${BRANDING_OFF:+--no-branding} \
   --out "${BODY}"
+
+if [ -n "${CANVAS_URL:-}" ]; then
+  printf '\n\n<a href="%s">Open the interactive canvas</a>\n' "${CANVAS_URL}" >> "${BODY}"
+fi
 
 MARKER="$(cli comment --print-marker)"
 

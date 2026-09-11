@@ -21,7 +21,8 @@
         "summary": "Fetches suppressions once, then posts batched payloads of 500 to Postmark.",
         "files": [
           {
-            "path": "functions/src/broadcast/sendBroadcastBulk.ts"
+            "path": "functions/src/broadcast/sendBroadcastBulk.ts",
+            "revision": "head"
           }
         ],
         "badges": []
@@ -37,7 +38,8 @@
         "lane": "functions",
         "files": [
           {
-            "path": "packages/broadcast-lib/src/buildBulkPayload.ts"
+            "path": "packages/broadcast-lib/src/buildBulkPayload.ts",
+            "revision": "head"
           }
         ],
         "badges": []
@@ -53,7 +55,8 @@
         "lane": "functions",
         "files": [
           {
-            "path": "packages/broadcast-lib/src/getSuppressedEmails.ts"
+            "path": "packages/broadcast-lib/src/getSuppressedEmails.ts",
+            "revision": "head"
           }
         ],
         "badges": []
@@ -70,7 +73,8 @@
         "subtitle": "packages/broadcast-lib",
         "files": [
           {
-            "path": "packages/broadcast-lib/src/index.ts"
+            "path": "packages/broadcast-lib/src/index.ts",
+            "revision": "head"
           }
         ],
         "badges": []
@@ -87,7 +91,12 @@
         "label": "onWrite",
         "emphasis": "normal",
         "animated": false,
-        "files": []
+        "files": [
+          {
+            "path": "src/diagram-source.ts",
+            "revision": "head"
+          }
+        ]
       }
     },
     {
@@ -100,7 +109,12 @@
         "delta": "unchanged",
         "emphasis": "normal",
         "animated": false,
-        "files": []
+        "files": [
+          {
+            "path": "src/diagram-source.ts",
+            "revision": "head"
+          }
+        ]
       }
     },
     {
@@ -113,7 +127,12 @@
         "delta": "unchanged",
         "emphasis": "normal",
         "animated": false,
-        "files": []
+        "files": [
+          {
+            "path": "src/diagram-source.ts",
+            "revision": "head"
+          }
+        ]
       }
     },
     {
@@ -126,7 +145,12 @@
         "delta": "unchanged",
         "emphasis": "normal",
         "animated": false,
-        "files": []
+        "files": [
+          {
+            "path": "src/diagram-source.ts",
+            "revision": "head"
+          }
+        ]
       }
     },
     {
@@ -140,7 +164,12 @@
         "label": "batch size",
         "emphasis": "normal",
         "animated": false,
-        "files": []
+        "files": [
+          {
+            "path": "src/diagram-source.ts",
+            "revision": "head"
+          }
+        ]
       }
     },
     {
@@ -154,7 +183,12 @@
         "label": "GET suppression dump",
         "emphasis": "normal",
         "animated": false,
-        "files": []
+        "files": [
+          {
+            "path": "src/diagram-source.ts",
+            "revision": "head"
+          }
+        ]
       }
     },
     {
@@ -168,7 +202,12 @@
         "label": "500 msgs/call",
         "emphasis": "normal",
         "animated": false,
-        "files": []
+        "files": [
+          {
+            "path": "src/diagram-source.ts",
+            "revision": "head"
+          }
+        ]
       }
     },
     {
@@ -182,7 +221,12 @@
         "label": "write results",
         "emphasis": "normal",
         "animated": false,
-        "files": []
+        "files": [
+          {
+            "path": "src/diagram-source.ts",
+            "revision": "head"
+          }
+        ]
       }
     },
     {
@@ -202,7 +246,6 @@
       "id": "broadcast-queue",
       "patch": {
         "summary": "Queue documents carry the batch size and suppressed count the sender works from.",
-        "files": [],
         "badges": []
       }
     },
@@ -239,7 +282,12 @@
             "kind": "async",
             "delta": "unchanged",
             "animated": true,
-            "files": []
+            "files": [
+              {
+                "path": "src/diagram-source.ts",
+                "revision": "head"
+              }
+            ]
           },
           {
             "id": "trigger",
@@ -249,7 +297,12 @@
             "kind": "async",
             "delta": "unchanged",
             "animated": true,
-            "files": []
+            "files": [
+              {
+                "path": "src/diagram-source.ts",
+                "revision": "head"
+              }
+            ]
           },
           {
             "id": "suppressions-request",
@@ -259,7 +312,12 @@
             "kind": "sync",
             "delta": "unchanged",
             "animated": true,
-            "files": []
+            "files": [
+              {
+                "path": "src/diagram-source.ts",
+                "revision": "head"
+              }
+            ]
           },
           {
             "id": "suppressions-response",
@@ -269,7 +327,12 @@
             "kind": "return",
             "delta": "unchanged",
             "animated": true,
-            "files": []
+            "files": [
+              {
+                "path": "src/diagram-source.ts",
+                "revision": "head"
+              }
+            ]
           },
           {
             "id": "batch-post",
@@ -280,7 +343,12 @@
             "delta": "unchanged",
             "animated": true,
             "repeat": 4,
-            "files": []
+            "files": [
+              {
+                "path": "src/diagram-source.ts",
+                "revision": "head"
+              }
+            ]
           },
           {
             "id": "batch-results",
@@ -290,7 +358,12 @@
             "kind": "return",
             "delta": "unchanged",
             "animated": true,
-            "files": []
+            "files": [
+              {
+                "path": "src/diagram-source.ts",
+                "revision": "head"
+              }
+            ]
           },
           {
             "id": "write-results",
@@ -300,7 +373,12 @@
             "kind": "async",
             "delta": "unchanged",
             "animated": true,
-            "files": []
+            "files": [
+              {
+                "path": "src/diagram-source.ts",
+                "revision": "head"
+              }
+            ]
           }
         ]
       }

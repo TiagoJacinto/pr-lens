@@ -1,7 +1,12 @@
 import { SCHEMA_VERSION } from "@coldtea/pr-lens-schema";
 import { minimalGraph } from "@coldtea/pr-lens-schema/examples";
 import { expect, test, vi } from "vitest";
-import { applyKnownFields, extractGraph, readJsonObject, type KnownFields } from "../src/extract.js";
+import {
+  applyKnownFields,
+  extractGraph,
+  readJsonObject,
+  type KnownFields,
+} from "../src/extract.js";
 import { PrLensCliError } from "../src/errors.js";
 
 const known: KnownFields = {
@@ -17,13 +22,23 @@ const known: KnownFields = {
 };
 
 const modelBody = (): Record<string, unknown> => {
-  const { schemaVersion: _v, provenance: _p, ...rest } = structuredClone(minimalGraph);
-  return { ...rest, stats: { additions: 9999, chips: [{ label: "Batch size", value: "500" }] } };
+  const {
+    schemaVersion: _v,
+    provenance: _p,
+    ...rest
+  } = structuredClone(minimalGraph);
+  return {
+    ...rest,
+    stats: { additions: 9999, chips: [{ label: "Batch size", value: "500" }] },
+  };
 };
 
 test("what the repository knows is written over what the model claimed", () => {
   const stamped = applyKnownFields(
-    { ...modelBody(), provenance: { repo: { owner: "someone", name: "else" } } },
+    {
+      ...modelBody(),
+      provenance: { repo: { owner: "someone", name: "else" } },
+    },
     known,
   );
 
@@ -32,7 +47,12 @@ test("what the repository knows is written over what the model claimed", () => {
     kind: "graph",
     generatedAt: known.generatedAt,
     provenance: { repo: { owner: "coldteadotai", name: "pr-lens" } },
-    stats: { additions: 40, deletions: 12, filesChanged: 3, chips: [{ label: "Batch size", value: "500" }] },
+    stats: {
+      additions: 40,
+      deletions: 12,
+      filesChanged: 3,
+      chips: [{ label: "Batch size", value: "500" }],
+    },
   });
 });
 
@@ -50,7 +70,10 @@ test("an answer that holds no object fails with a reason to hand back", () => {
 });
 
 test("a lens that was not asked for cannot come back in the answer", () => {
-  const stamped = applyKnownFields({ ...modelBody(), lenses: ["architecture", "data-flow"] }, known);
+  const stamped = applyKnownFields(
+    { ...modelBody(), lenses: ["architecture", "data-flow"] },
+    known,
+  );
   expect(stamped).toMatchObject({ lenses: ["architecture"] });
 });
 
@@ -74,7 +97,10 @@ test("a model that answers with prose twice fails saying so", async () => {
   const complete = vi.fn().mockResolvedValue("I cannot help with that");
 
   await expect(
-    extractGraph({ system: "s", user: "u", maxOutputTokens: 1024, known }, complete),
+    extractGraph(
+      { system: "s", user: "u", maxOutputTokens: 1024, known },
+      complete,
+    ),
   ).rejects.toThrow(expect.objectContaining({ code: "MODEL_OUTPUT_INVALID" }));
   expect(complete).toHaveBeenCalledTimes(2);
 });
@@ -83,7 +109,19 @@ test("an invalid document buys one correction round, and the errors go back to t
   const complete = vi
     .fn()
     .mockResolvedValueOnce(
-      JSON.stringify({ ...modelBody(), edges: [{ id: "e1", from: "health-route", to: "ghost", kind: "call", delta: "added" }] }),
+      JSON.stringify({
+        ...modelBody(),
+        edges: [
+          {
+            id: "e1",
+            from: "health-route",
+            to: "ghost",
+            kind: "call",
+            delta: "added",
+            files: [{ path: "src/a.ts", revision: "head" }],
+          },
+        ],
+      }),
     )
     .mockResolvedValueOnce(JSON.stringify(modelBody()));
 
@@ -96,15 +134,24 @@ test("an invalid document buys one correction round, and the errors go back to t
   expect(document.nodes).toHaveLength(1);
 
   const repair = complete.mock.calls[1]?.[0];
-  expect(repair.turns.map((turn: { role: string }) => turn.role)).toEqual(["user", "model", "user"]);
+  expect(repair.turns.map((turn: { role: string }) => turn.role)).toEqual([
+    "user",
+    "model",
+    "user",
+  ]);
   expect(repair.turns[2].text).toContain("BROKEN_REFERENCE");
 });
 
 test("a model that cannot produce a valid document twice fails with the reasons", async () => {
-  const complete = vi.fn().mockResolvedValue(JSON.stringify({ ...modelBody(), nodes: [] }));
+  const complete = vi
+    .fn()
+    .mockResolvedValue(JSON.stringify({ ...modelBody(), nodes: [] }));
 
   await expect(
-    extractGraph({ system: "s", user: "u", maxOutputTokens: 1024, known }, complete),
+    extractGraph(
+      { system: "s", user: "u", maxOutputTokens: 1024, known },
+      complete,
+    ),
   ).rejects.toThrow(PrLensCliError);
   expect(complete).toHaveBeenCalledTimes(2);
 });

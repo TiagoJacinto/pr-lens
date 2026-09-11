@@ -13,7 +13,8 @@ import { tiers } from "./tiers.js";
 const drawableLenses = (doc: GraphDoc): Lens[] =>
   doc.lenses.filter((lens) => lens !== "data-flow" || doc.flows.length > 0);
 
-const wholeDocument = (doc: GraphDoc): ScopedGraph => resolveScope(doc, { kind: "all" });
+const wholeDocument = (doc: GraphDoc): ScopedGraph =>
+  resolveScope(doc, { kind: "all" });
 
 /**
  * Exactly what a lens is answerable for. The architecture lens draws the graph
@@ -23,7 +24,12 @@ const wholeDocument = (doc: GraphDoc): ScopedGraph => resolveScope(doc, { kind: 
 const expectedKeys = (
   lens: Lens,
   graph: ScopedGraph,
-): { lanes: string[]; nodes: string[]; edges: string[]; messages: Record<string, string[]> } => {
+): {
+  lanes: string[];
+  nodes: string[];
+  edges: string[];
+  messages: Record<string, string[]>;
+} => {
   switch (lens) {
     case "architecture":
       return {
@@ -44,7 +50,10 @@ const expectedKeys = (
         ],
         edges: [],
         messages: Object.fromEntries(
-          graph.flows.map((flow) => [flow.id, flow.messages.map((message) => message.id)]),
+          graph.flows.map((flow) => [
+            flow.id,
+            flow.messages.map((message) => message.id),
+          ]),
         ),
       };
     default:
@@ -55,29 +64,43 @@ const expectedKeys = (
 const sorted = (ids: readonly string[]): string[] => [...ids].sort();
 
 const isDrawn = (box: Box): boolean =>
-  Number.isFinite(box.x) && Number.isFinite(box.y) && box.width >= 0 && box.height >= 0;
+  Number.isFinite(box.x) &&
+  Number.isFinite(box.y) &&
+  box.width >= 0 &&
+  box.height >= 0;
 
 describe("the atlas is as deterministic as the drawing", () => {
   it("across two renders of the same document", () => {
-    const first = render(postmarkRefactorGraph, { lens: "architecture", theme: "dark" });
-    const second = render(postmarkRefactorGraph, { lens: "architecture", theme: "dark" });
+    const first = render(postmarkRefactorGraph, {
+      lens: "architecture",
+      theme: "dark",
+    });
+    const second = render(postmarkRefactorGraph, {
+      lens: "architecture",
+      theme: "dark",
+    });
 
     expect(second.svg).toBe(first.svg);
     expect(JSON.stringify(second.atlas)).toBe(JSON.stringify(first.atlas));
   });
 
   it("across a round trip through JSON", () => {
-    const reparsed = parseGraphDoc(JSON.parse(JSON.stringify(postmarkRefactorGraph)));
+    const reparsed = parseGraphDoc(
+      JSON.parse(JSON.stringify(postmarkRefactorGraph)),
+    );
     const drawn = render(reparsed, { lens: "data-flow", theme: "dark" });
-    const reference = render(postmarkRefactorGraph, { lens: "data-flow", theme: "dark" });
+    const reference = render(postmarkRefactorGraph, {
+      lens: "data-flow",
+      theme: "dark",
+    });
 
     expect(JSON.stringify(drawn.atlas)).toBe(JSON.stringify(reference.atlas));
   });
 
   for (const lens of ["architecture", "data-flow"] as const)
     it(`does not move when the theme changes, in the ${lens} lens`, () => {
-      const atlases = THEMES.map(
-        (theme) => JSON.stringify(render(postmarkRefactorGraph, { lens, theme }).atlas),
+      const atlases = THEMES.map((theme) =>
+        JSON.stringify(render(postmarkRefactorGraph, { lens, theme }).atlas),
       );
       expect(new Set(atlases).size).toBe(1);
     });
@@ -90,13 +113,23 @@ describe("every drawn thing has a box, and nothing else does", () => {
         const { atlas } = render(doc, { lens, theme: "dark" });
         const expected = expectedKeys(lens, wholeDocument(doc));
 
-        expect(sorted(Object.keys(atlas.lanes))).toEqual(sorted(expected.lanes));
-        expect(sorted(Object.keys(atlas.nodes))).toEqual(sorted(expected.nodes));
-        expect(sorted(Object.keys(atlas.edges))).toEqual(sorted(expected.edges));
-        expect(sorted(Object.keys(atlas.messages))).toEqual(sorted(Object.keys(expected.messages)));
+        expect(sorted(Object.keys(atlas.lanes))).toEqual(
+          sorted(expected.lanes),
+        );
+        expect(sorted(Object.keys(atlas.nodes))).toEqual(
+          sorted(expected.nodes),
+        );
+        expect(sorted(Object.keys(atlas.edges))).toEqual(
+          sorted(expected.edges),
+        );
+        expect(sorted(Object.keys(atlas.messages))).toEqual(
+          sorted(Object.keys(expected.messages)),
+        );
 
         for (const [flow, steps] of Object.entries(expected.messages))
-          expect(sorted(Object.keys(atlas.messages[flow] ?? {}))).toEqual(sorted(steps));
+          expect(sorted(Object.keys(atlas.messages[flow] ?? {}))).toEqual(
+            sorted(steps),
+          );
 
         for (const box of everyBox(atlas)) expect(isDrawn(box)).toBe(true);
       });
@@ -108,10 +141,15 @@ describe("every drawn thing has a box, and nothing else does", () => {
       view: "new-batch-path",
     });
     const view = postmarkRefactorGraph.views[0]?.children[0];
-    if (view === undefined) throw new Error("the reference document lost its drill-down view");
+    if (view === undefined)
+      throw new Error("the reference document lost its drill-down view");
 
     expect(sorted(Object.keys(atlas.nodes))).toEqual(
-      sorted(resolveScope(postmarkRefactorGraph, view.scope).nodes.map((node) => node.id)),
+      sorted(
+        resolveScope(postmarkRefactorGraph, view.scope).nodes.map(
+          (node) => node.id,
+        ),
+      ),
     );
   });
 });
@@ -144,7 +182,9 @@ const cardRects = (svg: string): string[] => {
 };
 
 const atlasRects = (boxes: Record<string, Box>): string[] =>
-  Object.values(boxes).map((box) => `${box.x},${box.y},${box.width},${box.height}`);
+  Object.values(boxes).map(
+    (box) => `${box.x},${box.y},${box.width},${box.height}`,
+  );
 
 describe("the atlas agrees with the SVG", () => {
   it("in the architecture lens", () => {
@@ -181,7 +221,14 @@ const stackedFlows = (): GraphDoc =>
         title: "First",
         participants: [{ node: "queue-route" }, { node: "broadcast-queue" }],
         messages: [
-          { id: "enqueue", from: "queue-route", to: "broadcast-queue", label: "enqueue", delta: "added" },
+          {
+            id: "enqueue",
+            from: "queue-route",
+            to: "broadcast-queue",
+            label: "enqueue",
+            delta: "added",
+            files: [{ path: "test/fixture.ts", revision: "head" }],
+          },
         ],
       },
       {
@@ -189,7 +236,14 @@ const stackedFlows = (): GraphDoc =>
         title: "Second",
         participants: [{ node: "broadcast-queue" }, { node: "postmark" }],
         messages: [
-          { id: "post", from: "broadcast-queue", to: "postmark", label: "post", delta: "added" },
+          {
+            id: "post",
+            from: "broadcast-queue",
+            to: "postmark",
+            label: "post",
+            delta: "added",
+            files: [{ path: "test/fixture.ts", revision: "head" }],
+          },
         ],
       },
     ],
@@ -199,7 +253,11 @@ const stackedFlows = (): GraphDoc =>
 describe("a node drawn twice", () => {
   it("gets the box covering both of its cards", () => {
     const doc = stackedFlows();
-    const layout = layoutDataFlow(doc.flows, doc.nodes, FLOW_MAX_PULSES_PER_MESSAGE);
+    const layout = layoutDataFlow(
+      doc.flows,
+      doc.nodes,
+      FLOW_MAX_PULSES_PER_MESSAGE,
+    );
     const cards = layout.flows.flatMap((flow) =>
       flow.participants
         .filter((participant) => participant.node.id === "broadcast-queue")
@@ -209,7 +267,8 @@ describe("a node drawn twice", () => {
 
     const { atlas } = render(doc, { lens: "data-flow", theme: "dark" });
     const shared = atlas.nodes["broadcast-queue"];
-    if (shared === undefined) throw new Error("the stacked flows lost their shared participant");
+    if (shared === undefined)
+      throw new Error("the stacked flows lost their shared participant");
 
     const both = union(cards);
     expect(shared.width).toBeCloseTo(both?.width ?? 0, 2);
@@ -217,7 +276,10 @@ describe("a node drawn twice", () => {
   });
 
   it("keys the two flows' steps apart", () => {
-    const { atlas } = render(stackedFlows(), { lens: "data-flow", theme: "dark" });
+    const { atlas } = render(stackedFlows(), {
+      lens: "data-flow",
+      theme: "dark",
+    });
     expect(Object.keys(atlas.messages)).toEqual(["first", "second"]);
     expect(Object.keys(atlas.messages["first"] ?? {})).toEqual(["enqueue"]);
     expect(Object.keys(atlas.messages["second"] ?? {})).toEqual(["post"]);

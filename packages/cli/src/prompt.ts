@@ -29,7 +29,7 @@ export const SYSTEM_PROMPT = [
   "- Use as few lanes as carry that meaning: three or four. Every lane makes the diagram wider, and a diagram wider than a pull request comment is shown scaled down — past about four lanes the labels on the cards stop being readable without opening the image. If you reach six, two of them are usually the same boundary at different granularity: merge them, and express the finer split as a `group` on the nodes instead, which costs no width.",
   "- Mark at most one or two edges 'hero': the connection the change is really about.",
   "- Give the document a title a reviewer would recognise, and a summary that answers 'what does this change do?' in a short paragraph.",
-  "- Attach file refs to nodes, edges and steps wherever the diff shows where they live: they become the permalinks a reader clicks.",
+  "- Every node, edge and flow message must carry at least one valid file ref. Each ref must name its revision explicitly: use head for present/changed source and base for source removed by this pull request. Never leave a source-backed unit without a ref, and never point removed source at head.",
   "- Add a data flow only when the change actually has an ordered sequence worth animating. One good flow beats three thin ones.",
   "- Choose architecture views as a C4-inspired decision tree, not a quota. A small change may need only one useful view.",
   "- Start at the highest useful level: use system context when the change affects a user, an external system or a system boundary; otherwise start with containers. Container views cover affected applications, services, jobs, data stores and runtimes. Add a component child only when an affected container's internals matter. Do not add code-level views by default.",
@@ -50,7 +50,10 @@ const fileList = (diff: Diff): string =>
     })
     .join("\n");
 
-export const buildExtractionPrompt = (context: PromptContext, jsonSchema: string): string =>
+export const buildExtractionPrompt = (
+  context: PromptContext,
+  jsonSchema: string,
+): string =>
   [
     `Repository: ${context.repo.owner}/${context.repo.name}`,
     `Base commit: ${context.base.sha}${context.base.ref ? ` (${context.base.ref})` : ""}`,
@@ -60,7 +63,7 @@ export const buildExtractionPrompt = (context: PromptContext, jsonSchema: string
     `Changed files (${context.diff.files.length}, +${context.diff.additions} -${context.diff.deletions}):`,
     fileList(context.diff),
     "",
-    "Leave out schemaVersion, kind, generatedAt, provenance, and the numeric fields of stats. Those are filled in from the repository itself, and anything you write there is discarded.",
+    "Leave out schemaVersion, kind, generatedAt, provenance, and the numeric fields of stats. Those are filled in from the repository itself, and anything you write there is discarded. The base and head commit SHAs shown above are authoritative; source refs must explicitly identify base or head, including removed source.",
     "",
     "JSON Schema of the document (draft 2020-12). A field with a default may be omitted:",
     "",

@@ -1,4 +1,4 @@
-import { createHash } from "node:crypto";
+import { sha256 } from "@noble/hashes/sha2.js";
 import type { GraphDoc, Lens, RenderAsset, RenderManifest } from "@coldtea/pr-lens-schema";
 import { SCHEMA_VERSION } from "@coldtea/pr-lens-schema";
 import type { Theme } from "./theme.js";
@@ -20,8 +20,11 @@ export const CONTENT_HASH_LENGTH = 32;
  * app uploading them — must hash through here, or the two will disagree about
  * what the same render is called.
  */
+const hex = (bytes: Uint8Array): string =>
+  Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+
 export const contentHash = (bytes: string): string =>
-  createHash("sha256").update(bytes, "utf8").digest("hex").slice(0, CONTENT_HASH_LENGTH);
+  hex(sha256(new TextEncoder().encode(bytes))).slice(0, CONTENT_HASH_LENGTH);
 
 /** JSON with object keys in sorted order, so equal documents hash equal. */
 export const canonicalJson = (value: unknown): string => {

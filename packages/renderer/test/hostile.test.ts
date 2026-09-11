@@ -1,13 +1,26 @@
-import type { Flow, GraphDoc, GraphNode, ViewInput } from "@coldtea/pr-lens-schema";
+import type {
+  Flow,
+  GraphDoc,
+  GraphNode,
+  ViewInput,
+} from "@coldtea/pr-lens-schema";
 import {
   MAX_RENDER_ASSETS,
   MAX_VIEWS,
   parseGraphDoc,
   parseRenderManifest,
 } from "@coldtea/pr-lens-schema";
-import { minimalGraph, postmarkRefactorGraph } from "@coldtea/pr-lens-schema/examples";
+import {
+  minimalGraph,
+  postmarkRefactorGraph,
+} from "@coldtea/pr-lens-schema/examples";
 import { describe, expect, it } from "vitest";
-import { render, renderAll, renderAssetFileName, renderAssetId } from "../src/index.js";
+import {
+  render,
+  renderAll,
+  renderAssetFileName,
+  renderAssetId,
+} from "../src/index.js";
 import { layoutArchitecture } from "../src/layout/architecture.js";
 
 const node = (id: string, lane: string, label = id): GraphNode => ({
@@ -16,7 +29,7 @@ const node = (id: string, lane: string, label = id): GraphNode => ({
   kind: "other",
   delta: "unchanged",
   lane,
-  files: [],
+  files: [{ path: "test/fixture.ts", revision: "head" as const }],
   badges: [],
 });
 
@@ -28,7 +41,7 @@ const edge = (from: string, to: string) => ({
   delta: "unchanged" as const,
   emphasis: "normal" as const,
   animated: false,
-  files: [],
+  files: [{ path: "test/fixture.ts", revision: "head" as const }],
 });
 
 const graph = (over: Partial<GraphDoc>): GraphDoc =>
@@ -42,15 +55,22 @@ const graph = (over: Partial<GraphDoc>): GraphDoc =>
  * would read an `l8,-6` as an absolute point far off the canvas.
  */
 const drawnPoints = (svg: string): { x: number; y: number }[] => {
-  const shift = svg.match(/transform="translate\((-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)\)"/);
+  const shift = svg.match(
+    /transform="translate\((-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)\)"/,
+  );
   const dx = Number(shift?.[1] ?? 0);
   const dy = Number(shift?.[2] ?? 0);
 
   const points: { x: number; y: number }[] = [];
-  for (const path of svg.matchAll(/<path class="(?:glow|edge|msg)[^"]*"[^>]*? d="([^"]+)"/g)) {
+  for (const path of svg.matchAll(
+    /<path class="(?:glow|edge|msg)[^"]*"[^>]*? d="([^"]+)"/g,
+  )) {
     const numbers = (path[1] ?? "").match(/-?\d+(?:\.\d+)?/g) ?? [];
     for (let index = 0; index + 1 < numbers.length; index += 2)
-      points.push({ x: Number(numbers[index]) + dx, y: Number(numbers[index + 1]) + dy });
+      points.push({
+        x: Number(numbers[index]) + dx,
+        y: Number(numbers[index + 1]) + dy,
+      });
   }
   return points;
 };
@@ -64,7 +84,11 @@ describe("a view id is not a file path", () => {
   const hostile = "a/../../elsewhere";
 
   it("cannot put a separator or a dot segment in an asset's name", () => {
-    const address = { lens: "architecture" as const, theme: "dark" as const, view: hostile };
+    const address = {
+      lens: "architecture" as const,
+      theme: "dark" as const,
+      view: hostile,
+    };
     const name = renderAssetFileName(address, "0123456789abcdef");
     expect(name).not.toContain("/");
     expect(name).not.toContain("..");
@@ -73,14 +97,22 @@ describe("a view id is not a file path", () => {
 
   it("gives two different ids two different names", () => {
     const dark = { lens: "architecture" as const, theme: "dark" as const };
-    expect(renderAssetId({ ...dark, view: "a/b" })).not.toBe(renderAssetId({ ...dark, view: "a_sb" }));
-    expect(renderAssetId({ ...dark, view: "a.b" })).not.toBe(renderAssetId({ ...dark, view: "a_db" }));
+    expect(renderAssetId({ ...dark, view: "a/b" })).not.toBe(
+      renderAssetId({ ...dark, view: "a_sb" }),
+    );
+    expect(renderAssetId({ ...dark, view: "a.b" })).not.toBe(
+      renderAssetId({ ...dark, view: "a_db" }),
+    );
   });
 
   it("keeps an ordinary id readable", () => {
-    expect(renderAssetId({ lens: "architecture", theme: "dark", view: "new-batch-path" })).toBe(
-      "new-batch-path-dark",
-    );
+    expect(
+      renderAssetId({
+        lens: "architecture",
+        theme: "dark",
+        view: "new-batch-path",
+      }),
+    ).toBe("new-batch-path-dark");
   });
 
   it("stays a legal id however long the view id was", () => {
@@ -103,7 +135,9 @@ describe("a view id is not a file path", () => {
       expect(asset.id.length).toBeLessThanOrEqual(128);
       expect(asset.id).toMatch(/^[A-Za-z0-9][A-Za-z0-9._:/-]*$/);
     }
-    expect(() => parseRenderManifest(JSON.parse(JSON.stringify(manifest)))).not.toThrow();
+    expect(() =>
+      parseRenderManifest(JSON.parse(JSON.stringify(manifest))),
+    ).not.toThrow();
   });
 
   it("still tells two long view ids apart", () => {
@@ -140,9 +174,14 @@ describe("characters XML has no spelling for", () => {
   const NON_CHARACTER = "\uFFFE";
 
   it("are dropped rather than written into the document", () => {
-    const doc = graph({ title: `safe${NUL}title`, summary: `a${VERTICAL_TAB}b` });
+    const doc = graph({
+      title: `safe${NUL}title`,
+      summary: `a${VERTICAL_TAB}b`,
+    });
     const { svg } = render(doc, { lens: "architecture", theme: "dark" });
-    expect(svg).not.toMatch(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\uFFFE\uFFFF]/u);
+    expect(svg).not.toMatch(
+      /[\u0000-\u0008\u000B\u000C\u000E-\u001F\uFFFE\uFFFF]/u,
+    );
     expect(svg).toContain("safetitle");
   });
 
@@ -154,7 +193,13 @@ describe("characters XML has no spelling for", () => {
 
   it("leave a well-formed astral character whole", () => {
     const doc = graph({
-      nodes: [{ ...node("health-route", "api", "ship it \u{1F680}"), delta: "modified" }],
+      nodes: [
+        {
+          ...node("health-route", "api", "ship it \u{1F680}"),
+          delta: "modified",
+          files: [{ path: "test/fixture.ts", revision: "head" }],
+        },
+      ],
     });
     const { svg } = render(doc, { lens: "architecture", theme: "dark" });
     expect(svg).toContain("\u{1F680}");
@@ -175,7 +220,10 @@ describe("nothing is drawn outside the canvas", () => {
       nodes: [node("a", "one"), node("b", "one"), node("c", "one")],
       edges: [edge("a", "b"), edge("b", "c"), edge("a", "c")],
     });
-    const { svg, width, height } = render(doc, { lens: "architecture", theme: "dark" });
+    const { svg, width, height } = render(doc, {
+      lens: "architecture",
+      theme: "dark",
+    });
     const box = viewBoxOf(svg);
 
     expect(box).toEqual({ width, height });
@@ -198,20 +246,32 @@ describe("nothing is drawn outside the canvas", () => {
           title: "Loop",
           participants: [{ node: "queue-route" }, { node: "postmark" }],
           messages: [
-            { id: "out", from: "queue-route", to: "postmark", label: "call", delta: "added" },
+            {
+              id: "out",
+              from: "queue-route",
+              to: "postmark",
+              label: "call",
+              delta: "added",
+              files: [{ path: "test/fixture.ts", revision: "head" }],
+            },
             {
               id: "think",
               from: "postmark",
               to: "postmark",
-              label: "a rather long aside about what it does while it has the call",
+              label:
+                "a rather long aside about what it does while it has the call",
               kind: "self",
               delta: "added",
+              files: [{ path: "test/fixture.ts", revision: "head" }],
             },
           ],
         },
       ],
     });
-    const { svg, width, height } = render(doc, { lens: "data-flow", theme: "dark" });
+    const { svg, width, height } = render(doc, {
+      lens: "data-flow",
+      theme: "dark",
+    });
 
     expect(viewBoxOf(svg)).toEqual({ width, height });
     for (const point of drawnPoints(svg)) {
@@ -228,6 +288,7 @@ describe("a long flow animates one step at a time, in order", () => {
     to: index % 2 === 0 ? "postmark" : "queue-route",
     label: `step ${index}`,
     delta: "added" as const,
+    files: [{ path: "test/fixture.ts", revision: "head" }],
   }));
 
   const doc = parseGraphDoc({
@@ -245,14 +306,16 @@ describe("a long flow animates one step at a time, in order", () => {
   });
 
   const { svg } = render(doc, { lens: "data-flow", theme: "dark" });
-  const slots = [...svg.matchAll(/keyPoints="0;0;1;1" keyTimes="0;([\d.]+);([\d.]+);1"/g)].map(
-    (found) => ({ start: Number(found[1]), finish: Number(found[2]) }),
-  );
+  const slots = [
+    ...svg.matchAll(/keyPoints="0;0;1;1" keyTimes="0;([\d.]+);([\d.]+);1"/g),
+  ].map((found) => ({ start: Number(found[1]), finish: Number(found[2]) }));
 
   it("gives every step its own moment", () => {
     expect(slots).toHaveLength(64);
     for (let index = 1; index < slots.length; index += 1)
-      expect(slots[index]?.start ?? 0).toBeGreaterThan(slots[index - 1]?.start ?? 0);
+      expect(slots[index]?.start ?? 0).toBeGreaterThan(
+        slots[index - 1]?.start ?? 0,
+      );
   });
 
   it("hands straight from one step to the next, with no dark gap between", () => {
@@ -261,7 +324,10 @@ describe("a long flow animates one step at a time, in order", () => {
     expect(slots[0]?.start).toBe(0);
     expect(slots[slots.length - 1]?.finish).toBe(1);
     for (let index = 1; index < slots.length; index += 1)
-      expect(slots[index]?.start ?? 0).toBeCloseTo(slots[index - 1]?.finish ?? 0, 3);
+      expect(slots[index]?.start ?? 0).toBeCloseTo(
+        slots[index - 1]?.finish ?? 0,
+        3,
+      );
   });
 
   it("shows each dot for exactly its own crossing and no longer", () => {
@@ -274,8 +340,12 @@ describe("a long flow animates one step at a time, in order", () => {
     expect(circles).toHaveLength(64);
 
     for (const circle of circles) {
-      const motion = circle.match(/keyPoints="0;0;1;1" keyTimes="0;([\d.]+);([\d.]+);1"/);
-      const fade = circle.match(/values="0;0;1;1;0;0" keyTimes="0;([\d.]+);[\d.]+;[\d.]+;([\d.]+);1"/);
+      const motion = circle.match(
+        /keyPoints="0;0;1;1" keyTimes="0;([\d.]+);([\d.]+);1"/,
+      );
+      const fade = circle.match(
+        /values="0;0;1;1;0;0" keyTimes="0;([\d.]+);[\d.]+;[\d.]+;([\d.]+);1"/,
+      );
       expect(motion).not.toBeNull();
       expect(fade).not.toBeNull();
       expect(Number(fade?.[1])).toBeCloseTo(Number(motion?.[1]), 4);
@@ -297,31 +367,44 @@ describe("a long flow animates one step at a time, in order", () => {
 describe("columns", () => {
   const layoutOf = (doc: GraphDoc) =>
     layoutArchitecture(
-      { lanes: doc.lanes, nodes: doc.nodes, edges: doc.edges, flows: doc.flows },
+      {
+        lanes: doc.lanes,
+        nodes: doc.nodes,
+        edges: doc.edges,
+        flows: doc.flows,
+      },
       doc.layout,
     );
 
   const withNode = (extra: Record<string, unknown>): GraphDoc =>
     parseGraphDoc({
       ...JSON.parse(JSON.stringify(postmarkRefactorGraph)),
-      nodes: [...JSON.parse(JSON.stringify(postmarkRefactorGraph.nodes)), extra],
+      nodes: [
+        ...JSON.parse(JSON.stringify(postmarkRefactorGraph.nodes)),
+        extra,
+      ],
     });
 
   const retitled = (label: string): GraphDoc =>
     parseGraphDoc({
       ...JSON.parse(JSON.stringify(postmarkRefactorGraph)),
-      nodes: JSON.parse(JSON.stringify(postmarkRefactorGraph.nodes)).map((entry: GraphNode) =>
-        entry.id === "broadcast-composer" ? { ...entry, label } : entry,
+      nodes: JSON.parse(JSON.stringify(postmarkRefactorGraph.nodes)).map(
+        (entry: GraphNode) =>
+          entry.id === "broadcast-composer" ? { ...entry, label } : entry,
       ),
     });
 
   const columnsOf = (doc: GraphDoc) =>
-    layoutOf(doc).lanes.map(({ lane, box }) => `${lane.id}@${box.x}+${box.width}`);
+    layoutOf(doc).lanes.map(
+      ({ lane, box }) => `${lane.id}@${box.x}+${box.width}`,
+    );
 
   const base = columnsOf(postmarkRefactorGraph);
 
   it("are the same width whatever a lane happens to hold", () => {
-    const widths = new Set(layoutOf(postmarkRefactorGraph).lanes.map(({ box }) => box.width));
+    const widths = new Set(
+      layoutOf(postmarkRefactorGraph).lanes.map(({ box }) => box.width),
+    );
     expect(widths.size).toBe(1);
   });
 
@@ -336,7 +419,7 @@ describe("columns", () => {
       kind: "external",
       delta: "added",
       lane: "web",
-      files: [],
+      files: [{ path: "test/fixture.ts", revision: "head" as const }],
       badges: [],
     });
     expect(columnsOf(enlarged)).toEqual(base);
@@ -349,27 +432,38 @@ describe("columns", () => {
       kind: "external",
       delta: "added",
       lane: "web",
-      files: [],
+      files: [{ path: "test/fixture.ts", revision: "head" as const }],
       badges: [],
     });
     const before = new Map(
-      layoutOf(postmarkRefactorGraph).nodes.map(({ node: entry, box }) => [entry.id, box]),
+      layoutOf(postmarkRefactorGraph).nodes.map(({ node: entry, box }) => [
+        entry.id,
+        box,
+      ]),
     );
-    const after = new Map(layoutOf(enlarged).nodes.map(({ node: entry, box }) => [entry.id, box]));
+    const after = new Map(
+      layoutOf(enlarged).nodes.map(({ node: entry, box }) => [entry.id, box]),
+    );
 
     for (const entry of postmarkRefactorGraph.nodes)
-      if (entry.lane !== "web") expect(after.get(entry.id)).toEqual(before.get(entry.id));
+      if (entry.lane !== "web")
+        expect(after.get(entry.id)).toEqual(before.get(entry.id));
   });
 
   it("gives a lane header that does not fit the band its tail back", () => {
     const doc = parseGraphDoc({
       ...JSON.parse(JSON.stringify(postmarkRefactorGraph)),
-      lanes: JSON.parse(JSON.stringify(postmarkRefactorGraph.lanes)).map((lane: { id: string }) =>
-        lane.id === "web" ? { ...lane, label: "N".repeat(110), subtitle: "Vercel" } : lane,
+      lanes: JSON.parse(JSON.stringify(postmarkRefactorGraph.lanes)).map(
+        (lane: { id: string }) =>
+          lane.id === "web"
+            ? { ...lane, label: "N".repeat(110), subtitle: "Vercel" }
+            : lane,
       ),
     });
     expect(columnsOf(doc)).toEqual(base);
-    expect(render(doc, { lens: "architecture", theme: "dark" }).svg).toContain("…");
+    expect(render(doc, { lens: "architecture", theme: "dark" }).svg).toContain(
+      "…",
+    );
   });
 });
 
@@ -384,10 +478,18 @@ describe("ordering does not depend on the machine's locale", () => {
       edges: [],
     });
     const placed = layoutArchitecture(
-      { lanes: doc.lanes, nodes: doc.nodes, edges: doc.edges, flows: doc.flows as Flow[] },
+      {
+        lanes: doc.lanes,
+        nodes: doc.nodes,
+        edges: doc.edges,
+        flows: doc.flows as Flow[],
+      },
       doc.layout,
     );
-    expect(placed.nodes.map(({ node: placedNode }) => placedNode.id)).toEqual(["lower", "upper"]);
+    expect(placed.nodes.map(({ node: placedNode }) => placedNode.id)).toEqual([
+      "lower",
+      "upper",
+    ]);
     expect(placed.nodes.map(({ row }) => row)).toEqual([0, 1]);
   });
 });
@@ -397,13 +499,22 @@ describe("a view tree deeper than a manifest can describe", () => {
     let children: ViewInput[] = [];
     for (let index = count - 1; index >= 0; index -= 1)
       children = [
-        { id: `v${index}`, title: `v${index}`, lens: "architecture", scope: { kind: "all" }, children },
+        {
+          id: `v${index}`,
+          title: `v${index}`,
+          lens: "architecture",
+          scope: { kind: "all" },
+          children,
+        },
       ];
     return children;
   };
 
   const withViews = (count: number): GraphDoc =>
-    parseGraphDoc({ ...JSON.parse(JSON.stringify(minimalGraph)), views: nested(count) });
+    parseGraphDoc({
+      ...JSON.parse(JSON.stringify(minimalGraph)),
+      views: nested(count),
+    });
 
   /**
    * One view past what the contract allows. It cannot be parsed — that is the
@@ -432,7 +543,9 @@ describe("a view tree deeper than a manifest can describe", () => {
   it("renders the largest tree the contract allows, and the manifest round-trips", () => {
     const { assets, manifest } = renderAll(withViews(MAX_VIEWS));
     expect(assets).toHaveLength(MAX_RENDER_ASSETS);
-    expect(() => parseRenderManifest(JSON.parse(JSON.stringify(manifest)))).not.toThrow();
+    expect(() =>
+      parseRenderManifest(JSON.parse(JSON.stringify(manifest))),
+    ).not.toThrow();
   });
 
   it("refuses a hand-built tree past it rather than returning a manifest the contract rejects", () => {
@@ -466,8 +579,12 @@ describe("a view tree deeper than a manifest can describe", () => {
       assets: Array.from({ length: count }, () => asset),
     });
 
-    expect(() => parseRenderManifest(manifest(MAX_RENDER_ASSETS))).not.toThrow();
-    expect(() => parseRenderManifest(manifest(MAX_RENDER_ASSETS + 1))).toThrow();
+    expect(() =>
+      parseRenderManifest(manifest(MAX_RENDER_ASSETS)),
+    ).not.toThrow();
+    expect(() =>
+      parseRenderManifest(manifest(MAX_RENDER_ASSETS + 1)),
+    ).toThrow();
   });
 
   it("is a cap the contract enforces, so a parsed document can never reach the guard", () => {

@@ -65,7 +65,13 @@ const nestedViews = (count: number): ViewInput[] => {
   let children: ViewInput[] = [];
   for (let index = count - 1; index >= 0; index -= 1)
     children = [
-      { id: `v${index}`, title: `View ${index}`, lens: "architecture", scope: { kind: "all" }, children },
+      {
+        id: `v${index}`,
+        title: `View ${index}`,
+        lens: "architecture",
+        scope: { kind: "all" },
+        children,
+      },
     ];
   return children;
 };
@@ -90,7 +96,11 @@ const withWalkthrough = (steps: unknown[]) => ({
   walkthrough: { steps },
 });
 
-const withFileRef = (file: { path: string; startLine?: number; endLine?: number }) => ({
+const withFileRef = (file: {
+  path: string;
+  startLine?: number;
+  endLine?: number;
+}) => ({
   ...minimalGraphInput,
   nodes: [{ ...minimalGraphInput.nodes[0]!, files: [file] }],
 });
@@ -144,7 +154,14 @@ const parityCases: ParityCase[] = [
     parse: safeParseGraphDoc,
     document: {
       ...minimalGraphInput,
-      views: [{ id: "empty", title: "Empty", lens: "architecture", scope: { kind: "selection" } }],
+      views: [
+        {
+          id: "empty",
+          title: "Empty",
+          lens: "architecture",
+          scope: { kind: "selection" },
+        },
+      ],
     },
     accepted: false,
   },
@@ -225,7 +242,11 @@ const parityCases: ParityCase[] = [
     name: `${divergences[1]}, which only the parser can catch`,
     schema: "graph-doc.schema.json",
     parse: safeParseGraphDoc,
-    document: withFileRef({ path: "src/routes/health.ts", startLine: 20, endLine: 2 }),
+    document: withFileRef({
+      path: "src/routes/health.ts",
+      startLine: 20,
+      endLine: 2,
+    }),
     accepted: false,
     acceptedByJsonSchema: true,
   },
@@ -249,8 +270,9 @@ const parityCases: ParityCase[] = [
       flows: [
         {
           ...postmarkRefactorGraphInput.flows![0]!,
-          messages: postmarkRefactorGraphInput.flows![0]!.messages.map((message, index) =>
-            index === 0 ? { ...message, kind: "self" } : message,
+          messages: postmarkRefactorGraphInput.flows![0]!.messages.map(
+            (message, index) =>
+              index === 0 ? { ...message, kind: "self" } : message,
           ),
         },
       ],
@@ -315,14 +337,20 @@ const parityCases: ParityCase[] = [
     name: "a step heading longer than the rail can hold",
     schema: "graph-doc.schema.json",
     parse: safeParseGraphDoc,
-    document: withWalkthrough([{ ...twoSteps[0], heading: "a".repeat(49) }, twoSteps[1]]),
+    document: withWalkthrough([
+      { ...twoSteps[0], heading: "a".repeat(49) },
+      twoSteps[1],
+    ]),
     accepted: false,
   },
   {
     name: "a step body longer than the line beneath the heading",
     schema: "graph-doc.schema.json",
     parse: safeParseGraphDoc,
-    document: withWalkthrough([{ ...twoSteps[0], body: "a".repeat(141) }, twoSteps[1]]),
+    document: withWalkthrough([
+      { ...twoSteps[0], body: "a".repeat(141) },
+      twoSteps[1],
+    ]),
     accepted: false,
   },
   {
@@ -370,20 +398,31 @@ const parityCases: ParityCase[] = [
 ];
 
 describe("exported JSON Schemas", () => {
-  it.each(parityCases)("$schema and the parser agree on $name", async (parityCase) => {
-    const validate = await loadValidator(parityCase.schema);
-    const document = JsonObject.parse(JSON.parse(JSON.stringify(parityCase.document)));
+  it.each(parityCases)(
+    "$schema and the parser agree on $name",
+    async (parityCase) => {
+      const validate = await loadValidator(parityCase.schema);
+      const document = JsonObject.parse(
+        JSON.parse(JSON.stringify(parityCase.document)),
+      );
 
-    expect(validate(document), JSON.stringify(validate.errors, null, 2)).toBe(
-      parityCase.acceptedByJsonSchema ?? parityCase.accepted,
-    );
-    expect(parityCase.parse(parityCase.document).ok).toBe(parityCase.accepted);
-  });
+      expect(validate(document), JSON.stringify(validate.errors, null, 2)).toBe(
+        parityCase.acceptedByJsonSchema ?? parityCase.accepted,
+      );
+      expect(parityCase.parse(parityCase.document).ok).toBe(
+        parityCase.accepted,
+      );
+    },
+  );
 
   it("documents every rule it cannot carry", () => {
-    const asserted = parityCases.filter((parityCase) => parityCase.acceptedByJsonSchema === true);
+    const asserted = parityCases.filter(
+      (parityCase) => parityCase.acceptedByJsonSchema === true,
+    );
     expect(new Set(asserted.map((parityCase) => parityCase.name))).toEqual(
-      new Set(divergences.map((rule) => `${rule}, which only the parser can catch`)),
+      new Set(
+        divergences.map((rule) => `${rule}, which only the parser can catch`),
+      ),
     );
   });
 
@@ -397,6 +436,8 @@ describe("exported JSON Schemas", () => {
       JSON.parse(await readFile(join(packageRoot, "examples", golden), "utf8")),
     );
 
-    expect(validate(document), JSON.stringify(validate.errors, null, 2)).toBe(true);
+    expect(validate(document), JSON.stringify(validate.errors, null, 2)).toBe(
+      true,
+    );
   });
 });

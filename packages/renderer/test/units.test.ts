@@ -3,7 +3,10 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Config, GraphDoc, GraphNode } from "@coldtea/pr-lens-schema";
 import { parseConfig, parseGraphDoc } from "@coldtea/pr-lens-schema";
-import { minimalGraph, postmarkRefactorGraph } from "@coldtea/pr-lens-schema/examples";
+import {
+  minimalGraph,
+  postmarkRefactorGraph,
+} from "@coldtea/pr-lens-schema/examples";
 import { describe, expect, it } from "vitest";
 import {
   applyCorrections,
@@ -27,11 +30,16 @@ const corrections = (map: Partial<Config["map"]>): Config["map"] =>
 
 describe("text measurement", () => {
   it("grows with the string", () => {
-    expect(measure("mm", "sans", 13)).toBeGreaterThan(measure("ii", "sans", 13));
+    expect(measure("mm", "sans", 13)).toBeGreaterThan(
+      measure("ii", "sans", 13),
+    );
   });
 
   it("scales with the font size, to the hundredth it rounds to", () => {
-    expect(measure("hello", "sans", 26)).toBeCloseTo(measure("hello", "sans", 13) * 2, 1);
+    expect(measure("hello", "sans", 26)).toBeCloseTo(
+      measure("hello", "sans", 13) * 2,
+      1,
+    );
   });
 
   it("gives the same answer every time", () => {
@@ -62,7 +70,12 @@ describe("truncation", () => {
   });
 
   it("fits what it returns inside the room it was given", () => {
-    const shortened = truncate("getSuppressedEmailsForBroadcast", "sans-bold", 13, 80);
+    const shortened = truncate(
+      "getSuppressedEmailsForBroadcast",
+      "sans-bold",
+      13,
+      80,
+    );
     expect(shortened.endsWith("…")).toBe(true);
     expect(measure(shortened, "sans-bold", 13)).toBeLessThanOrEqual(80);
   });
@@ -86,7 +99,7 @@ describe("fitting a title to its card", () => {
         kind: "service",
         delta: "modified",
         lane: "api",
-        files: [],
+        files: [{ path: "test/fixture.ts", revision: "head" as const }],
         badges: [],
       })),
     });
@@ -135,7 +148,7 @@ describe("card badges", () => {
     kind: "function",
     delta,
     lane: "functions",
-    files: [],
+    files: [{ path: "test/fixture.ts", revision: "head" as const }],
     badges,
   });
 
@@ -148,11 +161,17 @@ describe("card badges", () => {
   });
 
   it("keeps a producer badge that only overlaps the delta badge in part", () => {
-    expect(cardBadges(node("added", ["new package"]))).toEqual(["new package", "NEW"]);
+    expect(cardBadges(node("added", ["new package"]))).toEqual([
+      "new package",
+      "NEW",
+    ]);
   });
 
   it("keeps every producer badge when none of them repeat the delta badge", () => {
-    expect(cardBadges(node("modified", ["+38 / -12"]))).toEqual(["+38 / -12", "CHANGED"]);
+    expect(cardBadges(node("modified", ["+38 / -12"]))).toEqual([
+      "+38 / -12",
+      "CHANGED",
+    ]);
   });
 });
 
@@ -180,18 +199,30 @@ describe("map corrections", () => {
   it("renames by node id", () => {
     const corrected = applyCorrections(
       postmarkRefactorGraph,
-      corrections({ rename: [{ match: "id:postmark", to: "Postmark (email)" }] }),
+      corrections({
+        rename: [{ match: "id:postmark", to: "Postmark (email)" }],
+      }),
     );
-    expect(corrected.nodes.find((node) => node.id === "postmark")?.label).toBe("Postmark (email)");
+    expect(corrected.nodes.find((node) => node.id === "postmark")?.label).toBe(
+      "Postmark (email)",
+    );
   });
 
   it("renames by the paths a node is backed by", () => {
     const corrected = applyCorrections(
       postmarkRefactorGraph,
-      corrections({ rename: [{ match: "packages/broadcast-lib/**", to: "shared" }] }),
+      corrections({
+        rename: [{ match: "packages/broadcast-lib/**", to: "shared" }],
+      }),
     );
-    const renamed = corrected.nodes.filter((node) => node.label === "shared").map((node) => node.id);
-    expect(renamed).toEqual(["build-bulk-payload", "get-suppressed-emails", "broadcast-lib"]);
+    const renamed = corrected.nodes
+      .filter((node) => node.label === "shared")
+      .map((node) => node.id);
+    expect(renamed).toEqual([
+      "build-bulk-payload",
+      "get-suppressed-emails",
+      "broadcast-lib",
+    ]);
   });
 
   it("takes every edge that touched an excluded node with it", () => {
@@ -200,15 +231,23 @@ describe("map corrections", () => {
       corrections({ exclude: ["id:postmark"] }),
     );
     expect(corrected.nodes.some((node) => node.id === "postmark")).toBe(false);
-    expect(corrected.edges.some((edge) => edge.from === "postmark" || edge.to === "postmark")).toBe(
-      false,
-    );
+    expect(
+      corrected.edges.some(
+        (edge) => edge.from === "postmark" || edge.to === "postmark",
+      ),
+    ).toBe(false);
   });
 
   it("drops a flow that lost too many participants to make sense", () => {
     const corrected = applyCorrections(
       postmarkRefactorGraph,
-      corrections({ exclude: ["id:postmark", "id:broadcast-queue", "id:send-broadcast-bulk"] }),
+      corrections({
+        exclude: [
+          "id:postmark",
+          "id:broadcast-queue",
+          "id:send-broadcast-bulk",
+        ],
+      }),
     );
     expect(corrected.flows).toHaveLength(0);
   });
@@ -216,9 +255,13 @@ describe("map corrections", () => {
   it("takes a view's dangling ids out, and the view when nothing is left", () => {
     const corrected = applyCorrections(
       postmarkRefactorGraph,
-      corrections({ exclude: ["id:process-broadcast", "id:send-single-email"] }),
+      corrections({
+        exclude: ["id:process-broadcast", "id:send-single-email"],
+      }),
     );
-    const retired = corrected.views[0]?.children.find((view) => view.id === "retired-path");
+    const retired = corrected.views[0]?.children.find(
+      (view) => view.id === "retired-path",
+    );
     expect(retired).toBeUndefined();
   });
 
@@ -227,16 +270,20 @@ describe("map corrections", () => {
       postmarkRefactorGraph,
       corrections({ lane: [{ match: "id:broadcast-lib", lane: "shared" }] }),
     );
-    expect(corrected.lanes.some((lane) => lane.id === "shared" && lane.label === "shared")).toBe(
-      true,
-    );
-    expect(corrected.nodes.find((node) => node.id === "broadcast-lib")?.lane).toBe("shared");
+    expect(
+      corrected.lanes.some(
+        (lane) => lane.id === "shared" && lane.label === "shared",
+      ),
+    ).toBe(true);
+    expect(
+      corrected.nodes.find((node) => node.id === "broadcast-lib")?.lane,
+    ).toBe("shared");
   });
 
   it("refuses to draw a document its own config emptied", () => {
-    expect(() => applyCorrections(minimalGraph, corrections({ exclude: ["**"] }))).toThrowError(
-      expect.objectContaining({ code: "NOTHING_TO_RENDER" }),
-    );
+    expect(() =>
+      applyCorrections(minimalGraph, corrections({ exclude: ["**"] })),
+    ).toThrowError(expect.objectContaining({ code: "NOTHING_TO_RENDER" }));
   });
 
   it("is applied before layout when render is given a config", () => {
@@ -244,8 +291,13 @@ describe("map corrections", () => {
       schemaVersion: "0.1.0",
       map: { rename: [{ match: "id:postmark", to: "Mailer" }] },
     });
-    expect(render(postmarkRefactorGraph, { lens: "architecture", theme: "dark", config }).svg)
-      .toContain("Mailer");
+    expect(
+      render(postmarkRefactorGraph, {
+        lens: "architecture",
+        theme: "dark",
+        config,
+      }).svg,
+    ).toContain("Mailer");
   });
 });
 
@@ -254,16 +306,25 @@ describe("view scoping", () => {
     const view = postmarkRefactorGraph.views[0]?.children.find(
       (child) => child.id === "retired-path",
     );
-    const scoped = resolveScope(postmarkRefactorGraph, view?.scope ?? { kind: "all" });
+    const scoped = resolveScope(
+      postmarkRefactorGraph,
+      view?.scope ?? { kind: "all" },
+    );
     expect(scoped.nodes.map((node) => node.id)).toContain("broadcast-queue");
-    expect(scoped.lanes.map((lane) => lane.id)).toEqual(["functions", "external"]);
+    expect(scoped.lanes.map((lane) => lane.id)).toEqual([
+      "functions",
+      "external",
+    ]);
   });
 
   it("draws exactly the edges a selection names", () => {
     const view = postmarkRefactorGraph.views[0]?.children.find(
       (child) => child.id === "retired-path",
     );
-    const scoped = resolveScope(postmarkRefactorGraph, view?.scope ?? { kind: "all" });
+    const scoped = resolveScope(
+      postmarkRefactorGraph,
+      view?.scope ?? { kind: "all" },
+    );
     expect(scoped.edges.map((edge) => edge.id)).toEqual([
       "firestore-to-process",
       "process-to-single",
@@ -291,28 +352,37 @@ describe("addresses", () => {
   });
 
   it("sorts object keys before hashing a document", () => {
-    expect(canonicalJson({ b: 1, a: { d: 2, c: 3 } })).toBe('{"a":{"c":3,"d":2},"b":1}');
+    expect(canonicalJson({ b: 1, a: { d: 2, c: 3 } })).toBe(
+      '{"a":{"c":3,"d":2},"b":1}',
+    );
   });
 
   it("names an asset after its view, or its lens when there is no view", () => {
-    expect(renderAssetId({ lens: "architecture", theme: "dark", view: "overview" })).toBe(
-      "overview-dark",
-    );
-    expect(renderAssetId({ lens: "data-flow", theme: "light", view: undefined })).toBe(
-      "data-flow-light",
-    );
+    expect(
+      renderAssetId({ lens: "architecture", theme: "dark", view: "overview" }),
+    ).toBe("overview-dark");
+    expect(
+      renderAssetId({ lens: "data-flow", theme: "light", view: undefined }),
+    ).toBe("data-flow-light");
   });
 
   it("builds a file name from the id and the hash", () => {
     expect(
-      renderAssetFileName({ lens: "architecture", theme: "dark", view: "overview" }, "abc123"),
+      renderAssetFileName(
+        { lens: "architecture", theme: "dark", view: "overview" },
+        "abc123",
+      ),
     ).toBe("overview-dark-abc123.svg");
   });
 });
 
 describe("the version in the manifest", () => {
   it("matches the package it came from", () => {
-    const manifestPath = join(dirname(fileURLToPath(import.meta.url)), "..", "package.json");
+    const manifestPath = join(
+      dirname(fileURLToPath(import.meta.url)),
+      "..",
+      "package.json",
+    );
     const parsed: unknown = JSON.parse(readFileSync(manifestPath, "utf8"));
     const pkg = parsed as { name: string; version: string };
     expect(RENDERER_NAME).toBe(pkg.name);
@@ -328,7 +398,8 @@ describe("errors", () => {
       expect.unreachable("expected a refusal");
     } catch (error) {
       expect(error).toBeInstanceOf(PrLensRenderError);
-      if (error instanceof PrLensRenderError) expect(error.code).toBe("LENS_NOT_DECLARED");
+      if (error instanceof PrLensRenderError)
+        expect(error.code).toBe("LENS_NOT_DECLARED");
     }
   });
 });
@@ -340,15 +411,21 @@ describe("layout hints survive a correction", () => {
       corrections({ exclude: ["id:send-broadcast-bulk"] }),
     );
     expect(corrected.layout?.rank).toBeDefined();
-    expect(Object.keys(corrected.layout?.rank ?? {})).not.toContain("send-broadcast-bulk");
+    expect(Object.keys(corrected.layout?.rank ?? {})).not.toContain(
+      "send-broadcast-bulk",
+    );
   });
 
   it("leave a document the contract still accepts", () => {
     const corrected = applyCorrections(
       postmarkRefactorGraph,
-      corrections({ exclude: ["id:send-broadcast-bulk", "id:postmark", "id:queue-route"] }),
+      corrections({
+        exclude: ["id:send-broadcast-bulk", "id:postmark", "id:queue-route"],
+      }),
     );
-    expect(() => parseGraphDoc(JSON.parse(JSON.stringify(corrected)))).not.toThrow();
+    expect(() =>
+      parseGraphDoc(JSON.parse(JSON.stringify(corrected))),
+    ).not.toThrow();
   });
 
   /**
@@ -364,10 +441,28 @@ describe("layout hints survive a correction", () => {
         {
           id: "first",
           title: "First",
-          participants: [{ node: "queue-route" }, { node: "broadcast-queue" }, { node: "send-broadcast-bulk" }],
+          participants: [
+            { node: "queue-route" },
+            { node: "broadcast-queue" },
+            { node: "send-broadcast-bulk" },
+          ],
           messages: [
-            { id: "shared", from: "queue-route", to: "broadcast-queue", label: "enqueue", delta: "added" },
-            { id: "keep", from: "broadcast-queue", to: "send-broadcast-bulk", label: "trigger", delta: "added" },
+            {
+              id: "shared",
+              from: "queue-route",
+              to: "broadcast-queue",
+              label: "enqueue",
+              delta: "added",
+              files: [{ path: "test/fixture.ts", revision: "head" as const }],
+            },
+            {
+              id: "keep",
+              from: "broadcast-queue",
+              to: "send-broadcast-bulk",
+              label: "trigger",
+              delta: "added",
+              files: [{ path: "test/fixture.ts", revision: "head" as const }],
+            },
           ],
         },
         {
@@ -375,7 +470,14 @@ describe("layout hints survive a correction", () => {
           title: "Second",
           participants: [{ node: "broadcast-queue" }, { node: "postmark" }],
           messages: [
-            { id: "shared", from: "broadcast-queue", to: "postmark", label: "post", delta: "added" },
+            {
+              id: "shared",
+              from: "broadcast-queue",
+              to: "postmark",
+              label: "post",
+              delta: "added",
+              files: [{ path: "test/fixture.ts", revision: "head" as const }],
+            },
           ],
         },
       ],
@@ -399,12 +501,20 @@ describe("layout hints survive a correction", () => {
     });
 
   it("leave a walkthrough pointing only at flow steps the stage still draws", () => {
-    const corrected = applyCorrections(sharedStepIds(), corrections({ exclude: ["id:queue-route"] }));
-    const step = corrected.walkthrough?.steps.find(({ id }) => id === "over-first");
+    const corrected = applyCorrections(
+      sharedStepIds(),
+      corrections({ exclude: ["id:queue-route"] }),
+    );
+    const step = corrected.walkthrough?.steps.find(
+      ({ id }) => id === "over-first",
+    );
 
-    if (step?.focus.kind !== "selection") throw new Error("expected a selection focus");
+    if (step?.focus.kind !== "selection")
+      throw new Error("expected a selection focus");
     expect(step.focus.messages).toEqual(["keep"]);
-    expect(() => parseGraphDoc(JSON.parse(JSON.stringify(corrected)))).not.toThrow();
+    expect(() =>
+      parseGraphDoc(JSON.parse(JSON.stringify(corrected))),
+    ).not.toThrow();
   });
 
   const stepIds = (doc: GraphDoc): string[] =>
@@ -415,9 +525,12 @@ describe("layout hints survive a correction", () => {
       postmarkRefactorGraph,
       corrections({ exclude: ["id:build-bulk-payload"] }),
     );
-    const step = corrected.walkthrough?.steps.find(({ id }) => id === "batches-of-500");
+    const step = corrected.walkthrough?.steps.find(
+      ({ id }) => id === "batches-of-500",
+    );
 
-    if (step?.focus.kind !== "selection") throw new Error("expected a selection focus");
+    if (step?.focus.kind !== "selection")
+      throw new Error("expected a selection focus");
     expect(step.focus.nodes).toEqual(["send-broadcast-bulk", "postmark"]);
   });
 
@@ -434,7 +547,11 @@ describe("layout hints survive a correction", () => {
     const corrected = applyCorrections(
       postmarkRefactorGraph,
       corrections({
-        exclude: ["id:queue-route", "id:broadcast-queue", "id:send-broadcast-bulk"],
+        exclude: [
+          "id:queue-route",
+          "id:broadcast-queue",
+          "id:send-broadcast-bulk",
+        ],
       }),
     );
     expect(corrected.flows).toEqual([]);
@@ -445,6 +562,8 @@ describe("layout hints survive a correction", () => {
   it("keep the entries that still name something", () => {
     const corrected = applyCorrections(postmarkRefactorGraph, corrections({}));
     expect(corrected.layout?.rank).toEqual(postmarkRefactorGraph.layout?.rank);
-    expect(corrected.layout?.laneOrder).toEqual(postmarkRefactorGraph.layout?.laneOrder);
+    expect(corrected.layout?.laneOrder).toEqual(
+      postmarkRefactorGraph.layout?.laneOrder,
+    );
   });
 });
