@@ -34,8 +34,11 @@ inputs:
     description: Orphan branch the rendered SVGs are committed to. It holds no code and is never merged.
     default: pr-lens
   cli-version:
-    description: Version of @coldtea/pr-lens-cli to run.
+    description: Version of @coldtea/pr-lens-cli to run when cli-source is npm.
     default: 0.5.1
+  cli-source:
+    description: "CLI source: npm or workspace. Use workspace with this fork to include source-linking changes."
+    default: npm
   comment-author:
     description: >-
       Login that owns the PR Lens comment. Only a comment posted by this
@@ -90,23 +93,34 @@ runs:
       with:
         node-version: 20
 
+    - name: Build workspace CLI
+      if: inputs.cli-source == 'workspace'
+      shell: bash
+      run: |
+        set -euo pipefail
+        corepack pnpm --dir "${GITHUB_ACTION_PATH}" install --frozen-lockfile
+        corepack pnpm --dir "${GITHUB_ACTION_PATH}" --filter @coldtea/pr-lens-cli... run build
+
     - name: Analyze the diff
       id: analyze
       shell: bash
       run: |
         set -euo pipefail
-        npx --yes "@coldtea/pr-lens-cli@${CLI_VERSION}" analyze \
-          --base "${BASE_SHA}" \
-          --head "${HEAD_SHA}" \
-          --pr "${PR_NUMBER}" \
-          --provider "${PROVIDER}" \
-          --api-key-env PR_LENS_API_KEY \
-          ${MODEL:+--model "${MODEL}"} \
-          ${BASE_URL:+--base-url "${BASE_URL}"} \
-          ${LENS:+--lens "${LENS}"} \
-          --out "${RUNNER_TEMP}/pr-lens/graph.json"
+        args=(analyze
+          --base "${BASE_SHA}"
+          --head "${HEAD_SHA}"
+          --pr "${PR_NUMBER}"
+          --provider "${PROVIDER}"
+          --api-key-env PR_LENS_API_KEY
+          --out "${RUNNER_TEMP}/pr-lens/graph.json")
+        [[ -n "${MODEL}" ]] && args+=(--model "${MODEL}")
+        [[ -n "${BASE_URL}" ]] && args+=(--base-url "${BASE_URL}")
+        [[ -n "${LENS}" ]] && args+=(--lens "${LENS}")
+        bash "${GITHUB_ACTION_PATH}/scripts/run-cli.sh" "${args[@]}"
         echo "graph=${RUNNER_TEMP}/pr-lens/graph.json" >> "${GITHUB_OUTPUT}"
       env:
+        ACTION_PATH: ${{ github.action_path }}
+        CLI_SOURCE: ${{ inputs.cli-source }}
         CLI_VERSION: ${{ inputs.cli-version }}
         BASE_SHA: ${{ github.event.pull_request.base.sha }}
         HEAD_SHA: ${{ github.event.pull_request.head.sha }}
@@ -123,9 +137,11 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-        npx --yes "@coldtea/pr-lens-cli@${CLI_VERSION}" render "${RUNNER_TEMP}/pr-lens/graph.json" \
+        bash "${GITHUB_ACTION_PATH}/scripts/run-cli.sh" render "${RUNNER_TEMP}/pr-lens/graph.json" \
           --out "${RUNNER_TEMP}/pr-lens/assets"
       env:
+        ACTION_PATH: ${{ github.action_path }}
+        CLI_SOURCE: ${{ inputs.cli-source }}
         CLI_VERSION: ${{ inputs.cli-version }}
 
     - name: Publish the SVGs
@@ -154,6 +170,8 @@ runs:
       shell: bash
       run: bash "${GITHUB_ACTION_PATH}/scripts/comment.sh"
       env:
+        ACTION_PATH: ${{ github.action_path }}
+        CLI_SOURCE: ${{ inputs.cli-source }}
         CLI_VERSION: ${{ inputs.cli-version }}
         ASSETS_URL: ${{ steps.publish.outputs.assets-url }}
         CANVAS_URL: ${{ steps.canvas.outputs.canvas-url }}

@@ -28,6 +28,8 @@ jobs:
       - uses: coldteadotai/pr-lens/packages/action@v0
         with:
           api-key: ${{ secrets.GEMINI_API_KEY }}
+          model: gemini-2.5-flash
+          cli-source: workspace
           canvas-url: ${{ vars.PR_LENS_CANVAS_URL }}
           canvas-publish-token: ${{ secrets.PR_LENS_CANVAS_PUBLISH_TOKEN }}
 ```
@@ -60,7 +62,8 @@ Finding that comment takes more than the marker: anyone can post the marker them
 | `branding` | `true` | the "Rendered by PR Lens" footer |
 | `comment` | `true` | set `false` to render and publish without commenting |
 | `data-branch` | `pr-lens` | branch the SVGs are committed to |
-| `cli-version` | the version in this repository | version of `@coldtea/pr-lens-cli` to run |
+| `cli-version` | `0.5.1` | version of `@coldtea/pr-lens-cli` to run when `cli-source` is `npm` |
+| `cli-source` | `npm` | `npm` for the published CLI, or `workspace` to build the CLI from this action checkout |
 | `comment-author` | `github-actions[bot]` | the login that owns the comment; only its comments are ever edited |
 | `github-token` | `${{ github.token }}` | used to publish and to comment |
 | `canvas-url` | empty | base URL of the compatible interactive canvas service |

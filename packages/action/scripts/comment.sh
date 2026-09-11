@@ -5,9 +5,10 @@ set -euo pipefail
 
 WORK="${RUNNER_TEMP}/pr-lens"
 BODY="${WORK}/comment.md"
+ACTION_PATH="${ACTION_PATH:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 
 cli() {
-  npx --yes "@coldtea/pr-lens-cli@${CLI_VERSION}" "$@"
+  bash "${ACTION_PATH}/scripts/run-cli.sh" "$@"
 }
 
 # Whether this run still describes the pull request as it stands. A run that
