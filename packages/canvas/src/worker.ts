@@ -256,7 +256,10 @@ export default {
       });
     }
 
-    if (id !== undefined) return env.ASSETS.fetch(new Request(new URL("/index.html", request.url), request));
+    if (id !== undefined) {
+      const asset = await env.ASSETS.fetch(new Request(new URL("/", request.url), request));
+      return new Response(asset.body, asset);
+    }
     return env.ASSETS.fetch(request);
   },
 } satisfies ExportedHandler<Bindings>;
