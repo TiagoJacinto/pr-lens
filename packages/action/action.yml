@@ -99,6 +99,7 @@ runs:
       run: |
         set -euo pipefail
         corepack prepare pnpm@10.5.2 --activate
+        corepack enable
         corepack pnpm --dir "${GITHUB_ACTION_PATH}" install --frozen-lockfile
         corepack pnpm --dir "${GITHUB_ACTION_PATH}" --filter @coldtea/pr-lens-cli... run build
 
