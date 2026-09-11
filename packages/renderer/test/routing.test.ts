@@ -12,13 +12,16 @@ const layoutOf = (doc: typeof denseGraph) =>
     doc.layout,
   );
 
-const routesOf = (doc: typeof denseGraph) => routeEdges(doc.edges, layoutOf(doc));
+const routesOf = (doc: typeof denseGraph) =>
+  routeEdges(doc.edges, layoutOf(doc));
 
-const isStraight = (path: string): boolean => /^M[-\d.,]+ L[-\d.,]+$/.test(path);
+const isStraight = (path: string): boolean =>
+  /^M[-\d.,]+ L[-\d.,]+$/.test(path);
 
 describe("the right line for the job, on the reference pull request", () => {
   const routed = routesOf(postmarkRefactorGraph);
-  const pathOf = (id: string) => routed.find(({ edge }) => edge.id === id)?.path ?? "";
+  const pathOf = (id: string) =>
+    routed.find(({ edge }) => edge.id === id)?.path ?? "";
 
   it("draws aligned neighbours dead straight", () => {
     for (const id of [
@@ -37,9 +40,11 @@ describe("the right line for the job, on the reference pull request", () => {
   });
 
   it("fans the sendBroadcastBulk stem out of one shared port", () => {
-    const starts = ["bulk-to-payload", "bulk-to-suppressions", "bulk-to-lib"].map(
-      (id) => pathOf(id).match(/^M([-\d.]+,[-\d.]+)/)?.[1],
-    );
+    const starts = [
+      "bulk-to-payload",
+      "bulk-to-suppressions",
+      "bulk-to-lib",
+    ].map((id) => pathOf(id).match(/^M([-\d.]+,[-\d.]+)/)?.[1]);
     expect(new Set(starts).size).toBe(1);
   });
 });
@@ -47,7 +52,9 @@ describe("the right line for the job, on the reference pull request", () => {
 describe("the dead band and its exile corridor", () => {
   const layout = layoutOf(denseGraph);
   const routed = routeEdges(denseGraph.edges, layout);
-  const lastContentRight = Math.max(...layout.nodes.map(({ box }) => box.x + box.width));
+  const lastContentRight = Math.max(
+    ...layout.nodes.map(({ box }) => box.x + box.width),
+  );
   const boundsOf = (id: string) => {
     const route = routed.find(({ edge }) => edge.id === id);
     const xs: number[] = [];
@@ -59,13 +66,16 @@ describe("the dead band and its exile corridor", () => {
   it("drops removed cards below everything alive", () => {
     const deadFrom = layout.grid.deadFromRow ?? Number.NaN;
     for (const placed of layout.nodes) {
-      if (placed.node.delta === "removed") expect(placed.row).toBeGreaterThanOrEqual(deadFrom);
+      if (placed.node.delta === "removed")
+        expect(placed.row).toBeGreaterThanOrEqual(deadFrom);
       else expect(placed.row).toBeLessThan(deadFrom);
     }
   });
 
   it("exiles a removed edge with a living endpoint past the last lane, in both directions", () => {
-    expect(boundsOf("gateway-to-poller").right).toBeGreaterThan(lastContentRight);
+    expect(boundsOf("gateway-to-poller").right).toBeGreaterThan(
+      lastContentRight,
+    );
     expect(boundsOf("queue-to-blobs").right).toBeGreaterThan(lastContentRight);
   });
 
@@ -96,20 +106,59 @@ describe("exile around a living endpoint's pair partner", () => {
     },
     lanes: [{ id: "one", label: "One" }],
     nodes: [
-      { id: "a", label: "a", kind: "function", delta: "unchanged", lane: "one", group: "g" },
-      { id: "b", label: "b", kind: "function", delta: "unchanged", lane: "one", group: "g" },
-      { id: "d", label: "d", kind: "function", delta: "removed", lane: "one" },
+      {
+        id: "a",
+        label: "a",
+        kind: "function",
+        delta: "unchanged",
+        lane: "one",
+        files: [{ path: "test/fixture.ts", revision: "head" }],
+        group: "g",
+      },
+      {
+        id: "b",
+        label: "b",
+        kind: "function",
+        delta: "unchanged",
+        lane: "one",
+        files: [{ path: "test/fixture.ts", revision: "head" }],
+        group: "g",
+      },
+      {
+        id: "d",
+        label: "d",
+        kind: "function",
+        delta: "removed",
+        lane: "one",
+        files: [{ path: "test/fixture.ts", revision: "head" }],
+      },
     ],
     edges: [
-      { id: "dead-to-living", from: "d", to: "a", kind: "call", delta: "removed" },
-      { id: "living-to-dead", from: "a", to: "d", kind: "call", delta: "removed" },
+      {
+        id: "dead-to-living",
+        from: "d",
+        to: "a",
+        kind: "call",
+        delta: "removed",
+        files: [{ path: "test/fixture.ts", revision: "head" }],
+      },
+      {
+        id: "living-to-dead",
+        from: "a",
+        to: "d",
+        kind: "call",
+        delta: "removed",
+        files: [{ path: "test/fixture.ts", revision: "head" }],
+      },
     ],
   });
 
   const layout = layoutOf(doc);
   const routed = routeEdges(doc.edges, layout);
   const partner = layout.nodes.find(({ node }) => node.id === "b")?.box;
-  const contentRight = Math.max(...layout.nodes.map(({ box }) => box.x + box.width));
+  const contentRight = Math.max(
+    ...layout.nodes.map(({ box }) => box.x + box.width),
+  );
 
   /** Chords of the path: every command endpoint, treated as straight legs. */
   const chords = (path: string): [number, number, number, number][] => {
@@ -163,12 +212,17 @@ describe("exile around a living endpoint's pair partner", () => {
       expect(partner).toBeDefined();
       if (route === undefined || partner === undefined) return;
       for (const leg of chords(route.path))
-        expect(hitsBox(leg, partner), `${leg.join(",")} crosses the partner`).toBe(false);
+        expect(
+          hitsBox(leg, partner),
+          `${leg.join(",")} crosses the partner`,
+        ).toBe(false);
     });
 
     it(`still sends ${id} through the exile corridor`, () => {
       const route = routed.find(({ edge }) => edge.id === id);
-      const xs = [...(route?.path ?? "").matchAll(/([-\d.]+),[-\d.]+/g)].map((m) => Number(m[1]));
+      const xs = [...(route?.path ?? "").matchAll(/([-\d.]+),[-\d.]+/g)].map(
+        (m) => Number(m[1]),
+      );
       expect(Math.max(...xs)).toBeGreaterThan(contentRight);
     });
   }
@@ -190,7 +244,13 @@ describe("labels", () => {
 
   it("pins each dense label to its own edge exactly once", () => {
     const { svg } = render(denseGraph, { lens: "architecture", theme: "dark" });
-    for (const label of ["fast path", "backpressure", "emit stats", "drain", "flush blobs"])
+    for (const label of [
+      "fast path",
+      "backpressure",
+      "emit stats",
+      "drain",
+      "flush blobs",
+    ])
       expect((svg.match(new RegExp(`>${label}<`, "g")) ?? []).length).toBe(1);
   });
 });
@@ -198,11 +258,18 @@ describe("labels", () => {
 describe("the dense synthetic stays inside its canvas", () => {
   for (const theme of THEMES) {
     it(`in ${theme}`, () => {
-      const { svg, width, height } = render(denseGraph, { lens: "architecture", theme });
-      const shift = svg.match(/transform="translate\((-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)\)"/);
+      const { svg, width, height } = render(denseGraph, {
+        lens: "architecture",
+        theme,
+      });
+      const shift = svg.match(
+        /transform="translate\((-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)\)"/,
+      );
       const dx = Number(shift?.[1] ?? 0);
       const dy = Number(shift?.[2] ?? 0);
-      for (const path of svg.matchAll(/<path class="(?:glow|edge)[^"]*"[^>]*? d="([^"]+)"/g)) {
+      for (const path of svg.matchAll(
+        /<path class="(?:glow|edge)[^"]*"[^>]*? d="([^"]+)"/g,
+      )) {
         const numbers = (path[1] ?? "").match(/-?\d+(?:\.\d+)?/g) ?? [];
         for (let index = 0; index + 1 < numbers.length; index += 2) {
           expect(Number(numbers[index]) + dx).toBeGreaterThanOrEqual(0);
@@ -215,7 +282,8 @@ describe("the dense synthetic stays inside its canvas", () => {
   }
 
   it("draws the same bytes twice", () => {
-    const draw = () => render(denseGraph, { lens: "architecture", theme: "dark" }).svg;
+    const draw = () =>
+      render(denseGraph, { lens: "architecture", theme: "dark" }).svg;
     expect(draw()).toBe(draw());
   });
 });

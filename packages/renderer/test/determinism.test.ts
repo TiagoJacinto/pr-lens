@@ -6,7 +6,8 @@ import { layoutArchitecture } from "../src/layout/architecture.js";
 import { rankNodes } from "../src/layout/rank.js";
 import { render } from "../src/index.js";
 
-const draw = (doc: GraphDoc): string => render(doc, { lens: "architecture", theme: "dark" }).svg;
+const draw = (doc: GraphDoc): string =>
+  render(doc, { lens: "architecture", theme: "dark" }).svg;
 
 const layoutOf = (doc: GraphDoc) =>
   layoutArchitecture(
@@ -28,7 +29,9 @@ describe("the same document draws the same bytes", () => {
   });
 
   it("across a round trip through JSON", () => {
-    const reparsed = parseGraphDoc(JSON.parse(JSON.stringify(postmarkRefactorGraph)));
+    const reparsed = parseGraphDoc(
+      JSON.parse(JSON.stringify(postmarkRefactorGraph)),
+    );
     expect(draw(reparsed)).toBe(draw(postmarkRefactorGraph));
   });
 
@@ -42,7 +45,9 @@ describe("the same document draws the same bytes", () => {
           .map(([key, nested]) => [key, reversedKeys(nested)]),
       );
     };
-    const shuffled = parseGraphDoc(reversedKeys(JSON.parse(JSON.stringify(postmarkRefactorGraph))));
+    const shuffled = parseGraphDoc(
+      reversedKeys(JSON.parse(JSON.stringify(postmarkRefactorGraph))),
+    );
     expect(draw(shuffled)).toBe(draw(postmarkRefactorGraph));
   });
 
@@ -65,7 +70,7 @@ describe("a small change to the graph is a small change to the picture", () => {
     kind: "external",
     delta: "added",
     lane: "external",
-    files: [],
+    files: [{ path: "test/fixture.ts", revision: "head" as const }],
     badges: [],
   };
 
@@ -77,15 +82,24 @@ describe("a small change to the graph is a small change to the picture", () => {
   it("leaves every card in an earlier lane exactly where it was", () => {
     const before = boxes(postmarkRefactorGraph);
     const after = boxes(enlarged);
-    const untouched = postmarkRefactorGraph.nodes.filter((node) => node.lane !== "external");
+    const untouched = postmarkRefactorGraph.nodes.filter(
+      (node) => node.lane !== "external",
+    );
 
-    for (const node of untouched) expect(after.get(node.id)).toBe(before.get(node.id));
+    for (const node of untouched)
+      expect(after.get(node.id)).toBe(before.get(node.id));
   });
 
   it("seats the unconnected newcomer in its lane's empty top row and moves nothing", () => {
-    const before = layoutOf(postmarkRefactorGraph).nodes.find(({ node }) => node.id === "postmark");
-    const after = layoutOf(enlarged).nodes.find(({ node }) => node.id === "postmark");
-    const added = layoutOf(enlarged).nodes.find(({ node }) => node.id === "postmark-webhooks");
+    const before = layoutOf(postmarkRefactorGraph).nodes.find(
+      ({ node }) => node.id === "postmark",
+    );
+    const after = layoutOf(enlarged).nodes.find(
+      ({ node }) => node.id === "postmark",
+    );
+    const added = layoutOf(enlarged).nodes.find(
+      ({ node }) => node.id === "postmark-webhooks",
+    );
     expect(before?.row).toBe(5);
     expect(after?.row).toBe(5);
     expect(added?.row).toBe(0);
@@ -96,8 +110,11 @@ describe("a rename moves nothing", () => {
   it("even for a card sharing its row with a partner", () => {
     const renamed = parseGraphDoc({
       ...JSON.parse(JSON.stringify(postmarkRefactorGraph)),
-      nodes: JSON.parse(JSON.stringify(postmarkRefactorGraph.nodes)).map((entry: GraphNode) =>
-        entry.id === "broadcast-lib" ? { ...entry, label: "B".repeat(120) } : entry,
+      nodes: JSON.parse(JSON.stringify(postmarkRefactorGraph.nodes)).map(
+        (entry: GraphNode) =>
+          entry.id === "broadcast-lib"
+            ? { ...entry, label: "B".repeat(120) }
+            : entry,
       ),
     });
     expect(boxes(renamed)).toEqual(boxes(postmarkRefactorGraph));
@@ -106,8 +123,11 @@ describe("a rename moves nothing", () => {
   it("does not stretch the canvas to fit the longer name", () => {
     const renamed = parseGraphDoc({
       ...JSON.parse(JSON.stringify(postmarkRefactorGraph)),
-      nodes: JSON.parse(JSON.stringify(postmarkRefactorGraph.nodes)).map((entry: GraphNode) =>
-        entry.id === "broadcast-lib" ? { ...entry, label: "B".repeat(120) } : entry,
+      nodes: JSON.parse(JSON.stringify(postmarkRefactorGraph.nodes)).map(
+        (entry: GraphNode) =>
+          entry.id === "broadcast-lib"
+            ? { ...entry, label: "B".repeat(120) }
+            : entry,
       ),
     });
     const before = layoutOf(postmarkRefactorGraph);
@@ -125,7 +145,7 @@ describe("ranking", () => {
       kind: "other",
       delta: "unchanged",
       lane: "one",
-      files: [],
+      files: [{ path: "test/fixture.ts", revision: "head" as const }],
       badges: [],
     }));
 
@@ -137,11 +157,15 @@ describe("ranking", () => {
     delta: "unchanged" as const,
     emphasis: "normal" as const,
     animated: false,
-    files: [],
+    files: [{ path: "test/fixture.ts", revision: "head" as const }],
   });
 
   it("puts every node below the ones that feed it", () => {
-    const ranks = rankNodes(nodes(["a", "b", "c"]), [edge("a", "b"), edge("b", "c")], {});
+    const ranks = rankNodes(
+      nodes(["a", "b", "c"]),
+      [edge("a", "b"), edge("b", "c")],
+      {},
+    );
     expect([ranks.get("a"), ranks.get("b"), ranks.get("c")]).toEqual([0, 1, 2]);
   });
 
@@ -160,7 +184,10 @@ describe("ranking", () => {
   });
 
   it("does not let a hint lift a node above what feeds it", () => {
-    const ranks = rankNodes(nodes(["a", "b"]), [edge("a", "b")], { a: 3, b: 0 });
+    const ranks = rankNodes(nodes(["a", "b"]), [edge("a", "b")], {
+      a: 3,
+      b: 0,
+    });
     expect(ranks.get("a")).toBe(3);
     expect(ranks.get("b")).toBe(4);
   });

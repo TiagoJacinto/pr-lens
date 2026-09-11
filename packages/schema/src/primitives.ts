@@ -7,14 +7,14 @@ import { SCHEMA_VERSION, SUPPORTED_VERSION_PATTERN } from "./version.js";
  * GitHub comment anchor without escaping.
  */
 export const Id = z
-  .string()
-  .min(1)
-  .max(128)
-  .regex(
-    /^[A-Za-z0-9][A-Za-z0-9._:/-]*$/,
-    "must start alphanumeric and contain only letters, digits and . _ : / -",
-  )
-  .describe("Stable identifier, unique within its collection in a document.");
+ .string()
+ .min(1)
+ .max(128)
+ .regex(
+  /^[A-Za-z0-9][A-Za-z0-9._:/-]*$/,
+  "must start alphanumeric and contain only letters, digits and . _ : / -",
+ )
+ .describe("Stable identifier, unique within its collection in a document.");
 export type Id = z.infer<typeof Id>;
 
 /**
@@ -23,20 +23,26 @@ export type Id = z.infer<typeof Id>;
  * Schemas carry the range instead, since they have no parser behind them.
  */
 export const SchemaVersionField = z
-  .string()
-  .regex(/^\d+\.\d+\.\d+$/, "must be a semver string, e.g. 0.1.0")
-  .meta({ pattern: SUPPORTED_VERSION_PATTERN })
-  .describe(`Contract version the document targets. Current: ${SCHEMA_VERSION}.`);
+ .string()
+ .regex(/^\d+\.\d+\.\d+$/, "must be a semver string, e.g. 0.1.0")
+ .meta({ pattern: SUPPORTED_VERSION_PATTERN })
+ .describe(
+  `Contract version the document targets. Current: ${SCHEMA_VERSION}.`,
+ );
 
 /** Non-empty single-line label rendered on a card, lane header or edge. */
-export const Label = z.string().min(1).max(120).describe("Short display label.");
+export const Label = z
+ .string()
+ .min(1)
+ .max(120)
+ .describe("Short display label.");
 
 /** Prose shown in drill-down bodies; kept short enough to stay scannable. */
 export const Summary = z
-  .string()
-  .min(1)
-  .max(2000)
-  .describe("One or two sentences of plain prose. No markdown headings.");
+ .string()
+ .min(1)
+ .max(2000)
+ .describe("One or two sentences of plain prose. No markdown headings.");
 
 /**
  * A walkthrough step's heading. The cap is part of the contract rather than
@@ -44,25 +50,25 @@ export const Summary = z
  * turns the tour into a wall of text, and no producer can pad its way past it.
  */
 export const Beat = z
-  .string()
-  .min(1)
-  .max(48)
-  .describe("A step heading. Short enough to read at a glance.");
+ .string()
+ .min(1)
+ .max(48)
+ .describe("A step heading. Short enough to read at a glance.");
 
 /**
  * The one line of body under a step's heading. Required: a heading with
  * nothing under it reads as a step someone started and never finished.
  */
 export const Line = z
-  .string()
-  .min(1)
-  .max(140)
-  .describe("A single line under a step heading.");
+ .string()
+ .min(1)
+ .max(140)
+ .describe("A single line under a step heading.");
 
 export const Sha = z
-  .string()
-  .regex(/^[0-9a-f]{7,40}$/, "must be a lowercase hex git object name")
-  .describe("Git commit sha, abbreviated or full.");
+ .string()
+ .regex(/^[0-9a-f]{7,40}$/, "must be a lowercase hex git object name")
+ .describe("Git commit sha, abbreviated or full.");
 
 /**
  * Abbreviations are fine for something a human reads, but not for deciding
@@ -71,22 +77,29 @@ export const Sha = z
  * Anything a machine compares uses the full name.
  */
 export const FullSha = z
-  .string()
-  .regex(/^[0-9a-f]{40}$/, "must be a full 40-character lowercase hex git object name")
-  .describe("Git commit sha, in full.");
+ .string()
+ .regex(
+  /^[0-9a-f]{40}$/,
+  "must be a full 40-character lowercase hex git object name",
+ )
+ .describe("Git commit sha, in full.");
 
 /**
  * The two lenses PR Lens ships. The enum is additive: a future contract
  * version may introduce further lenses, and consumers must treat an unknown
  * lens as "skip this view" rather than as a hard failure.
  */
-export const Lens = z.enum(["architecture", "data-flow"]).describe("Rendering lens.");
+export const Lens = z
+ .enum(["architecture", "data-flow"])
+ .describe("Rendering lens.");
 export type Lens = z.infer<typeof Lens>;
 
 export const LENSES = Lens.options;
 
 /** The two renders that make a `<picture>` pair. */
-export const Theme = z.enum(["light", "dark"]).describe("Which colour scheme a render targets.");
+export const Theme = z
+ .enum(["light", "dark"])
+ .describe("Which colour scheme a render targets.");
 export type Theme = z.infer<typeof Theme>;
 
 export const THEMES = Theme.options;
@@ -118,8 +131,8 @@ export const MAX_VIEWS = MAX_RENDER_ASSETS / THEMES.length;
  * rather than omitted.
  */
 export const Delta = z
-  .enum(["added", "modified", "removed", "unchanged"])
-  .describe("Change state relative to the base commit.");
+ .enum(["added", "modified", "removed", "unchanged"])
+ .describe("Change state relative to the base commit.");
 export type Delta = z.infer<typeof Delta>;
 
 export const DELTAS = Delta.options;
@@ -129,7 +142,8 @@ export const DELTAS = Delta.options;
  * platform recognises, and no `..` segment. A path that breaks it cannot
  * produce a diff permalink, whatever else it might mean.
  */
-const REPOSITORY_PATH = /^(?!\/)(?![A-Za-z]:)(?!.*\\)(?!.*(?:^|\/)\.\.(?:\/|$)).+$/;
+const REPOSITORY_PATH =
+ /^(?!\/)(?![A-Za-z]:)(?!.*\\)(?!.*(?:^|\/)\.\.(?:\/|$)).+$/;
 
 /**
  * A pointer into the head tree, used to build diff permalinks. Line numbers
@@ -137,31 +151,37 @@ const REPOSITORY_PATH = /^(?!\/)(?![A-Za-z]:)(?!.*\\)(?!.*(?:^|\/)\.\.(?:\/|$)).
  * where they refer to the base revision.
  */
 export const FileRef = z
-  .strictObject({
-    path: z
-      .string()
-      .min(1)
-      .max(1024)
-      .regex(
-        REPOSITORY_PATH,
-        "must be a repository-relative POSIX path, without a drive letter, a backslash or a '..' segment",
-      )
-      .describe("Repository-relative path, POSIX separators."),
-    startLine: z.int().min(1).optional().describe("1-based first line."),
-    endLine: z.int().min(1).optional().describe("1-based last line, inclusive."),
-    revision: z
-      .enum(["head", "base"])
-      .optional()
-      .describe("Which side of the diff the lines refer to. Defaults to head."),
-  })
-  .meta({ dependentRequired: { endLine: ["startLine"] } })
-  .refine((f) => f.endLine === undefined || f.startLine !== undefined, {
-    message: "endLine requires startLine",
-    path: ["endLine"],
-  })
-  .refine((f) => f.endLine === undefined || f.startLine === undefined || f.endLine >= f.startLine, {
-    message: "endLine must be greater than or equal to startLine",
-    path: ["endLine"],
-  })
-  .describe("A file (and optional line range) backing an element.");
+ .strictObject({
+  path: z
+   .string()
+   .min(1)
+   .max(1024)
+   .regex(
+    REPOSITORY_PATH,
+    "must be a repository-relative POSIX path, without a drive letter, a backslash or a '..' segment",
+   )
+   .describe("Repository-relative path, POSIX separators."),
+  startLine: z.int().min(1).optional().describe("1-based first line."),
+  endLine: z.int().min(1).optional().describe("1-based last line, inclusive."),
+  revision: z
+   .enum(["head", "base"])
+   .default("head")
+   .describe("Which side of the diff the lines refer to."),
+ })
+ .meta({ dependentRequired: { endLine: ["startLine"] } })
+ .refine((f) => f.endLine === undefined || f.startLine !== undefined, {
+  message: "endLine requires startLine",
+  path: ["endLine"],
+ })
+ .refine(
+  (f) =>
+   f.endLine === undefined ||
+   f.startLine === undefined ||
+   f.endLine >= f.startLine,
+  {
+   message: "endLine must be greater than or equal to startLine",
+   path: ["endLine"],
+  },
+ )
+ .describe("A file (and optional line range) backing an element.");
 export type FileRef = z.infer<typeof FileRef>;

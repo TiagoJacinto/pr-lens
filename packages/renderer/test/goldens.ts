@@ -13,16 +13,17 @@ const GOLDEN_DIR = join(dirname(fileURLToPath(import.meta.url)), "__goldens__");
  * improvement.
  */
 export const expectGolden = (name: string, actual: string): void => {
-  const path = join(GOLDEN_DIR, name);
+ const path = join(GOLDEN_DIR, name);
 
-  if (process.env["UPDATE_GOLDENS"] === "1") {
-    mkdirSync(GOLDEN_DIR, { recursive: true });
-    writeFileSync(path, actual, "utf8");
-    return;
-  }
+ if (process.env["UPDATE_GOLDENS"] === "1") {
+  mkdirSync(GOLDEN_DIR, { recursive: true });
+  writeFileSync(path, actual, "utf8");
+  return;
+ }
 
-  const expected = readFileSync(path, "utf8");
-  expect(actual, `${name} differs from its golden; re-run with UPDATE_GOLDENS=1 to record`).toBe(
-    expected,
-  );
+ const expected = readFileSync(path, "utf8");
+ expect(
+  actual,
+  `${name} differs from its golden; re-run with UPDATE_GOLDENS=1 to record`,
+ ).toBe(expected);
 };

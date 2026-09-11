@@ -1,7 +1,12 @@
 import type { GraphDoc, GraphEdge } from "@coldtea/pr-lens-schema";
 import { parseGraphDoc } from "@coldtea/pr-lens-schema";
 import { describe, expect, it } from "vitest";
-import { PILL_HEIGHT, TRACK_CLEARANCE, TRACK_PITCH_MAX, TRACK_PITCH_MIN } from "../src/design.js";
+import {
+  PILL_HEIGHT,
+  TRACK_CLEARANCE,
+  TRACK_PITCH_MAX,
+  TRACK_PITCH_MIN,
+} from "../src/design.js";
 import type { Point } from "../src/geometry.js";
 import { relieveCongestion } from "../src/layout/congestion.js";
 import { channelTraffic } from "../src/layout/edges.js";
@@ -17,7 +22,9 @@ const scoped = (doc: GraphDoc) => ({
   flows: doc.flows,
 });
 
-const stress = tiers.filter(({ name }) => name.startsWith("tier4") || name.startsWith("tier5"));
+const stress = tiers.filter(
+  ({ name }) => name.startsWith("tier4") || name.startsWith("tier5"),
+);
 
 describe("the stress fixtures render the bytes their review saw", () => {
   for (const { name, doc } of stress)
@@ -31,7 +38,8 @@ describe("the stress fixtures render the bytes their review saw", () => {
 describe("the stress fixtures draw the same bytes twice", () => {
   for (const { name, doc } of stress)
     it(name, () => {
-      const draw = () => render(doc, { lens: "architecture", theme: "dark" }).svg;
+      const draw = () =>
+        render(doc, { lens: "architecture", theme: "dark" }).svg;
       expect(draw()).toBe(draw());
     });
 });
@@ -51,7 +59,9 @@ describe("no two label pills intersect, and every label appears exactly once", (
         height: Number(height),
       }));
 
-      expect(pills.length).toBe(doc.edges.filter((edge) => edge.label !== undefined).length);
+      expect(pills.length).toBe(
+        doc.edges.filter((edge) => edge.label !== undefined).length,
+      );
 
       pills.forEach((a, i) => {
         for (const b of pills.slice(i + 1)) {
@@ -60,7 +70,10 @@ describe("no two label pills intersect, and every label appears exactly once", (
             b.x + b.width <= a.x ||
             a.y + a.height <= b.y ||
             b.y + b.height <= a.y;
-          expect(apart, `pill at ${a.x},${a.y} intersects pill at ${b.x},${b.y}`).toBe(true);
+          expect(
+            apart,
+            `pill at ${a.x},${a.y} intersects pill at ${b.x},${b.y}`,
+          ).toBe(true);
         }
       });
     });
@@ -73,7 +86,13 @@ const distanceToLeg = (point: Point, from: Point, to: Point): number => {
   const t =
     lengthSquared === 0
       ? 0
-      : Math.min(Math.max(((point.x - from.x) * dx + (point.y - from.y) * dy) / lengthSquared, 0), 1);
+      : Math.min(
+          Math.max(
+            ((point.x - from.x) * dx + (point.y - from.y) * dy) / lengthSquared,
+            0,
+          ),
+          1,
+        );
   return Math.hypot(point.x - (from.x + dx * t), point.y - (from.y + dy * t));
 };
 
@@ -92,9 +111,10 @@ describe("every pill stays with its own line", () => {
           nearest = Math.min(nearest, distanceToLeg(centre, start, segment.to));
           start = segment.to;
         }
-        expect(nearest, `the ${edge.id} pill drifted from its line`).toBeLessThanOrEqual(
-          PILL_HEIGHT,
-        );
+        expect(
+          nearest,
+          `the ${edge.id} pill drifted from its line`,
+        ).toBeLessThanOrEqual(PILL_HEIGHT);
       }
     });
 });
@@ -112,8 +132,27 @@ describe("label settling", () => {
         head: { sha: "2222222" },
       },
       lanes: [{ id: "one", label: "One" }],
-      nodes: [{ id: "a", label: "a", kind: "function", delta: "unchanged", lane: "one" }],
-      edges: [{ id: "a-to-a", from: "a", to: "a", kind: "call", delta: "unchanged", label: "retry" }],
+      nodes: [
+        {
+          id: "a",
+          label: "a",
+          kind: "function",
+          delta: "unchanged",
+          files: [{ path: "test/fixture.ts", revision: "head" }],
+          lane: "one",
+        },
+      ],
+      edges: [
+        {
+          id: "a-to-a",
+          from: "a",
+          to: "a",
+          kind: "call",
+          delta: "unchanged",
+          files: [{ path: "test/fixture.ts", revision: "head" }],
+          label: "retry",
+        },
+      ],
     });
 
     const { routed } = relieveCongestion(scoped(doc), doc.layout);
@@ -135,7 +174,7 @@ describe("label settling", () => {
       delta: "unchanged",
       emphasis: "normal",
       animated: false,
-      files: [],
+      files: [{ path: "test/fixture.ts", revision: "head" as const }],
       label: "aa",
     });
     // Two identical L-shaped routes: a 100px horizontal anchor run, then a

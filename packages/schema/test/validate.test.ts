@@ -5,7 +5,11 @@ import type { GraphDocInput } from "../src/graph.js";
 import type { ViewInput } from "../src/graph.js";
 import { MAX_RENDER_ASSETS, MAX_VIEWS, THEMES } from "../src/primitives.js";
 import { postmarkRefactorManifestInput } from "../src/examples/postmark-refactor.js";
-import { safeParseConfig, safeParseGraphDoc, safeParseRenderManifest } from "../src/validate.js";
+import {
+  safeParseConfig,
+  safeParseGraphDoc,
+  safeParseRenderManifest,
+} from "../src/validate.js";
 import { SCHEMA_VERSION } from "../src/version.js";
 
 const clone = (doc: GraphDocInput): GraphDocInput => structuredClone(doc);
@@ -20,6 +24,49 @@ describe("graph document validation", () => {
   it("accepts the goldens", () => {
     expect(safeParseGraphDoc(postmarkRefactorGraphInput).ok).toBe(true);
     expect(safeParseGraphDoc(minimalGraphInput).ok).toBe(true);
+  });
+
+  it.each([
+    ["node", (doc: Record<string, unknown>) => doc.nodes],
+    ["edge", (doc: Record<string, unknown>) => doc.edges],
+    [
+      "message",
+      (doc: Record<string, unknown>) =>
+        (doc.flows as Array<Record<string, unknown>>)[0]?.messages,
+    ],
+  ])("rejects an omitted or empty %s files array", (_name, select) => {
+    const source = JSON.parse(
+      JSON.stringify(postmarkRefactorGraphInput),
+    ) as Record<string, unknown>;
+    const values = select(source);
+    const value = Array.isArray(values) ? values[0] : undefined;
+    if (!value || typeof value !== "object")
+      throw new Error("fixture is missing test value");
+    expect(safeParseGraphDoc({ ...source, nodes: source.nodes }).ok).toBe(true);
+    const omitted = { ...value };
+    delete omitted.files;
+    if (select === undefined) throw new Error("missing selector");
+    if (_name === "node") source.nodes = [omitted];
+    else if (_name === "edge") source.edges = [omitted];
+    else
+      source.flows = [
+        {
+          ...(source.flows as Array<Record<string, unknown>>)[0],
+          messages: [omitted],
+        },
+      ];
+    expect(safeParseGraphDoc(source).ok).toBe(false);
+    const empty = { ...source };
+    if (_name === "node") empty.nodes = [{ ...omitted, files: [] }];
+    else if (_name === "edge") empty.edges = [{ ...omitted, files: [] }];
+    else
+      empty.flows = [
+        {
+          ...(empty.flows as Array<Record<string, unknown>>)[0],
+          messages: [{ ...omitted, files: [] }],
+        },
+      ];
+    expect(safeParseGraphDoc(empty).ok).toBe(false);
   });
 
   it("applies documented defaults", () => {
@@ -39,7 +86,9 @@ describe("graph document validation", () => {
     const error = expectRejected(doc);
     expect(error.code).toBe("BROKEN_REFERENCE");
     expect(error.issues[0]?.path).toBe("nodes[0].lane");
-    expect(error.message).toContain("node 'health-route' references unknown lane 'typo-lane'");
+    expect(error.message).toContain(
+      "node 'health-route' references unknown lane 'typo-lane'",
+    );
   });
 
   it("rejects an edge that points at a node nobody declared", () => {
@@ -88,7 +137,10 @@ describe("graph document validation", () => {
 
   it("rejects a view scoped to an element that does not exist", () => {
     const doc = clone(postmarkRefactorGraphInput);
-    doc.views![0]!.children![0]!.scope = { kind: "selection", nodes: ["not-a-node"] };
+    doc.views![0]!.children![0]!.scope = {
+      kind: "selection",
+      nodes: ["not-a-node"],
+    };
 
     const error = expectRejected(doc);
     expect(error.issues[0]?.path).toBe("views[0].children[0].scope.nodes[0]");
@@ -96,33 +148,44 @@ describe("graph document validation", () => {
   });
 
   it("rejects unknown keys rather than dropping them", () => {
-    const error = expectRejected({ ...minimalGraphInput, findings: [{ severity: "high" }] });
+    const error = expectRejected({
+      ...minimalGraphInput,
+      findings: [{ severity: "high" }],
+    });
     expect(error.code).toBe("INVALID_DOCUMENT");
     expect(error.message).toContain("findings");
   });
 
   it("rejects a line range that ends before it starts", () => {
     const doc = clone(minimalGraphInput);
-    doc.nodes[0]!.files = [{ path: "src/routes/health.ts", startLine: 40, endLine: 12 }];
+    doc.nodes[0]!.files = [
+      { path: "src/routes/health.ts", startLine: 40, endLine: 12 },
+    ];
 
     const error = expectRejected(doc);
-    expect(error.message).toContain("endLine must be greater than or equal to startLine");
+    expect(error.message).toContain(
+      "endLine must be greater than or equal to startLine",
+    );
   });
 
-  it.each(["../../etc/passwd", "/etc/passwd", "C:\\Windows\\system32\\file.ts", "src\\index.ts"])(
-    "rejects '%s', which cannot become a diff permalink",
-    (path) => {
-      const doc = clone(minimalGraphInput);
-      doc.nodes[0]!.files = [{ path }];
+  it.each([
+    "../../etc/passwd",
+    "/etc/passwd",
+    "C:\\Windows\\system32\\file.ts",
+    "src\\index.ts",
+  ])("rejects '%s', which cannot become a diff permalink", (path) => {
+    const doc = clone(minimalGraphInput);
+    doc.nodes[0]!.files = [{ path }];
 
-      const error = expectRejected(doc);
-      expect(error.message).toContain("repository-relative POSIX path");
-    },
-  );
+    const error = expectRejected(doc);
+    expect(error.message).toContain("repository-relative POSIX path");
+  });
 
   it("keeps a filename that merely contains dots", () => {
     const doc = clone(minimalGraphInput);
-    doc.nodes[0]!.files = [{ path: "src/fine..name/health.ts" }];
+    doc.nodes[0]!.files = [
+      { path: "src/fine..name/health.ts", revision: "head" },
+    ];
 
     expect(safeParseGraphDoc(doc).ok).toBe(true);
   });
@@ -133,7 +196,9 @@ describe("graph document validation", () => {
 
     const error = expectRejected(doc);
     expect(error.code).toBe("UNSUPPORTED_SCHEMA_VERSION");
-    expect(error.message).toContain(`this package implements ${SCHEMA_VERSION}`);
+    expect(error.message).toContain(
+      `this package implements ${SCHEMA_VERSION}`,
+    );
   });
 
   it("reports every broken reference at once", () => {
@@ -191,29 +256,39 @@ describe("walkthroughs", () => {
 
   it("holds a heading to one line", () => {
     const [first, second] = stepsOfLength(2);
-    expect(safeParseGraphDoc(withSteps([{ ...first!, heading: "a".repeat(48) }, second!])).ok).toBe(
-      true,
-    );
-    expect(safeParseGraphDoc(withSteps([{ ...first!, heading: "a".repeat(49) }, second!])).ok).toBe(
-      false,
-    );
+    expect(
+      safeParseGraphDoc(
+        withSteps([{ ...first!, heading: "a".repeat(48) }, second!]),
+      ).ok,
+    ).toBe(true);
+    expect(
+      safeParseGraphDoc(
+        withSteps([{ ...first!, heading: "a".repeat(49) }, second!]),
+      ).ok,
+    ).toBe(false);
   });
 
   it("holds a body to one line", () => {
     const [first, second] = stepsOfLength(2);
-    expect(safeParseGraphDoc(withSteps([{ ...first!, body: "a".repeat(140) }, second!])).ok).toBe(
-      true,
-    );
-    expect(safeParseGraphDoc(withSteps([{ ...first!, body: "a".repeat(141) }, second!])).ok).toBe(
-      false,
-    );
+    expect(
+      safeParseGraphDoc(
+        withSteps([{ ...first!, body: "a".repeat(140) }, second!]),
+      ).ok,
+    ).toBe(true);
+    expect(
+      safeParseGraphDoc(
+        withSteps([{ ...first!, body: "a".repeat(141) }, second!]),
+      ).ok,
+    ).toBe(false);
   });
 
   it("rejects a step with no body, which reads as a heading someone left unfinished", () => {
     const [first, second] = stepsOfLength(2);
     const error = expectRejected({
       ...postmarkRefactorGraphInput,
-      walkthrough: { steps: [{ id: first!.id, heading: first!.heading }, second!] },
+      walkthrough: {
+        steps: [{ id: first!.id, heading: first!.heading }, second!],
+      },
     });
     expect(error.issues[0]?.path).toBe("walkthrough.steps[0].body");
   });
@@ -223,12 +298,16 @@ describe("walkthroughs", () => {
     const error = expectRejected(
       withSteps([{ ...first!, focus: { kind: "selection" } }, second!]),
     );
-    expect(error.message).toContain("a selection must name at least one element");
+    expect(error.message).toContain(
+      "a selection must name at least one element",
+    );
   });
 
   it("rejects two steps sharing an id", () => {
     const [first, second] = stepsOfLength(2);
-    const error = expectRejected(withSteps([first!, { ...second!, id: first!.id }]));
+    const error = expectRejected(
+      withSteps([first!, { ...second!, id: first!.id }]),
+    );
     expect(error.code).toBe("DUPLICATE_ID");
     expect(error.message).toContain("duplicate step id 'step-0'");
   });
@@ -236,7 +315,10 @@ describe("walkthroughs", () => {
   it("rejects a step staged on a view the document does not have", () => {
     const [first, second] = stepsOfLength(2);
     const error = expectRejected(
-      withSteps([{ ...first!, stage: { kind: "view", view: "no-such-view" } }, second!]),
+      withSteps([
+        { ...first!, stage: { kind: "view", view: "no-such-view" } },
+        second!,
+      ]),
     );
     expect(error.code).toBe("BROKEN_REFERENCE");
     expect(error.issues[0]?.path).toBe("walkthrough.steps[0].stage.view");
@@ -246,7 +328,10 @@ describe("walkthroughs", () => {
   it("rejects a step staged on a flow the document does not have", () => {
     const [first, second] = stepsOfLength(2);
     const error = expectRejected(
-      withSteps([{ ...first!, stage: { kind: "flow", flow: "no-such-flow" } }, second!]),
+      withSteps([
+        { ...first!, stage: { kind: "flow", flow: "no-such-flow" } },
+        second!,
+      ]),
     );
     expect(error.code).toBe("BROKEN_REFERENCE");
     expect(error.issues[0]?.path).toBe("walkthrough.steps[0].stage.flow");
@@ -255,7 +340,10 @@ describe("walkthroughs", () => {
   it("rejects a focus on an element the document does not have", () => {
     const [first, second] = stepsOfLength(2);
     const error = expectRejected(
-      withSteps([{ ...first!, focus: { kind: "selection", nodes: ["ghost"] } }, second!]),
+      withSteps([
+        { ...first!, focus: { kind: "selection", nodes: ["ghost"] } },
+        second!,
+      ]),
     );
     expect(error.issues[0]?.path).toBe("walkthrough.steps[0].focus.nodes[0]");
     expect(error.message).toContain("focuses unknown node 'ghost'");
@@ -314,7 +402,9 @@ describe("walkthroughs", () => {
       ]),
     );
     expect(error.code).toBe("BROKEN_REFERENCE");
-    expect(error.issues[0]?.path).toBe("walkthrough.steps[0].focus.messages[0]");
+    expect(error.issues[0]?.path).toBe(
+      "walkthrough.steps[0].focus.messages[0]",
+    );
     expect(error.message).toContain("which no flow on its stage carries");
   });
 
@@ -343,7 +433,10 @@ describe("walkthroughs", () => {
         {
           ...first!,
           stage: { kind: "flow", flow: "no-such-flow" },
-          focus: { kind: "selection", messages: ["batch-post", "batch-results"] },
+          focus: {
+            kind: "selection",
+            messages: ["batch-post", "batch-results"],
+          },
         },
         second!,
       ]),
@@ -357,7 +450,13 @@ const nestedViews = (count: number): ViewInput[] => {
   let children: ViewInput[] = [];
   for (let index = count - 1; index >= 0; index -= 1)
     children = [
-      { id: `v${index}`, title: `View ${index}`, lens: "architecture", scope: { kind: "all" }, children },
+      {
+        id: `v${index}`,
+        title: `View ${index}`,
+        lens: "architecture",
+        scope: { kind: "all" },
+        children,
+      },
     ];
   return children;
 };
@@ -392,11 +491,18 @@ describe("the drill-down tree and the render it implies", () => {
     const asset = postmarkRefactorManifestInput.assets[0]!;
     const manifestOf = (count: number) => ({
       ...postmarkRefactorManifestInput,
-      assets: Array.from({ length: count }, (_, index) => ({ ...asset, id: `asset-${index}` })),
+      assets: Array.from({ length: count }, (_, index) => ({
+        ...asset,
+        id: `asset-${index}`,
+      })),
     });
 
-    expect(safeParseRenderManifest(manifestOf(MAX_RENDER_ASSETS)).ok).toBe(true);
-    expect(safeParseRenderManifest(manifestOf(MAX_RENDER_ASSETS + 1)).ok).toBe(false);
+    expect(safeParseRenderManifest(manifestOf(MAX_RENDER_ASSETS)).ok).toBe(
+      true,
+    );
+    expect(safeParseRenderManifest(manifestOf(MAX_RENDER_ASSETS + 1)).ok).toBe(
+      false,
+    );
   });
 });
 
@@ -406,11 +512,19 @@ describe("config validation", () => {
     if (!result.ok) throw result.error;
     expect(result.value.lenses).toEqual(["architecture", "data-flow"]);
     expect(result.value.branding).toBe(true);
-    expect(result.value.map).toEqual({ rename: [], exclude: [], lane: [], group: [] });
+    expect(result.value.map).toEqual({
+      rename: [],
+      exclude: [],
+      lane: [],
+      group: [],
+    });
   });
 
   it("rejects lenses this version does not ship", () => {
-    const result = safeParseConfig({ schemaVersion: SCHEMA_VERSION, lenses: ["security"] });
+    const result = safeParseConfig({
+      schemaVersion: SCHEMA_VERSION,
+      lenses: ["security"],
+    });
     expect(result.ok).toBe(false);
   });
 

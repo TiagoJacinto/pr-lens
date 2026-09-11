@@ -33,7 +33,8 @@
       "lane": "api",
       "files": [
         {
-          "path": "src/routes/health.ts"
+          "path": "src/routes/health.ts",
+          "revision": "head"
         }
       ],
       "badges": []

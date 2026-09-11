@@ -12,15 +12,22 @@ import { graphIntegrityIssues, graphSnapshotIssues } from "../src/integrity.js";
 import type { PatchDoc, PatchOp } from "../src/patch.js";
 import { parseGraphDoc, safeParseGraphDoc } from "../src/validate.js";
 
-const apply = (ops: readonly PatchOp[], graph = postmarkRefactorGraph) => applyPatch(graph, ops);
+const apply = (ops: readonly PatchOp[], graph = postmarkRefactorGraph) =>
+  applyPatch(graph, ops);
 
-const expectApplied = (ops: readonly PatchOp[], graph = postmarkRefactorGraph) => {
+const expectApplied = (
+  ops: readonly PatchOp[],
+  graph = postmarkRefactorGraph,
+) => {
   const result = apply(ops, graph);
   if (!result.ok) throw result.error;
   return result.value;
 };
 
-const expectRejected = (ops: readonly PatchOp[], graph = postmarkRefactorGraph) => {
+const expectRejected = (
+  ops: readonly PatchOp[],
+  graph = postmarkRefactorGraph,
+) => {
   const result = apply(ops, graph);
   if (result.ok) throw new Error("expected the patch to be rejected");
   return result.error;
@@ -34,9 +41,15 @@ describe("applying a patch", () => {
   });
 
   it("takes the edges of a removed node with it", () => {
-    const patched = expectApplied([{ op: "remove_node", id: "send-single-email" }]);
-    expect(patched.edges.map((edge) => edge.id)).not.toContain("single-to-postmark");
-    expect(patched.edges.map((edge) => edge.id)).not.toContain("process-to-single");
+    const patched = expectApplied([
+      { op: "remove_node", id: "send-single-email" },
+    ]);
+    expect(patched.edges.map((edge) => edge.id)).not.toContain(
+      "single-to-postmark",
+    );
+    expect(patched.edges.map((edge) => edge.id)).not.toContain(
+      "process-to-single",
+    );
   });
 
   it("takes the flow steps of a removed participant with it", () => {
@@ -65,9 +78,14 @@ describe("applying a patch", () => {
   });
 
   it("prunes removed ids out of the drill-down tree", () => {
-    const patched = expectApplied([{ op: "remove_node", id: "process-broadcast" }]);
-    const retired = patched.views[0]?.children.find(({ id }) => id === "retired-path");
-    if (retired?.scope.kind !== "selection") throw new Error("expected a selection scope");
+    const patched = expectApplied([
+      { op: "remove_node", id: "process-broadcast" },
+    ]);
+    const retired = patched.views[0]?.children.find(
+      ({ id }) => id === "retired-path",
+    );
+    if (retired?.scope.kind !== "selection")
+      throw new Error("expected a selection scope");
     expect(retired.scope.nodes).toEqual(["send-single-email"]);
     expect(retired.scope.edges).toEqual(["single-to-postmark"]);
   });
@@ -90,7 +108,9 @@ describe("applying a patch", () => {
   });
 
   it("refuses to update something that is not there", () => {
-    const error = expectRejected([{ op: "update_edge", id: "nope", patch: { delta: "unchanged" } }]);
+    const error = expectRejected([
+      { op: "update_edge", id: "nope", patch: { delta: "unchanged" } },
+    ]);
     expect(error.code).toBe("PATCH_CONFLICT");
     expect(error.message).toContain("unknown edge 'nope'");
   });
@@ -111,7 +131,7 @@ describe("applying a patch", () => {
           kind: "module",
           delta: "added",
           lane: "nowhere",
-          files: [],
+          files: [{ path: "test/fixture.ts", revision: "head" }],
           badges: [],
         },
       },
@@ -142,12 +162,18 @@ describe("applying a patch", () => {
 
   it("takes removed nodes out of the layout hints", () => {
     const patched = expectApplied([{ op: "remove_node", id: "postmark" }]);
-    expect(patched.layout?.rank).toEqual({ "queue-route": 0, "send-broadcast-bulk": 1 });
+    expect(patched.layout?.rank).toEqual({
+      "queue-route": 0,
+      "send-broadcast-bulk": 1,
+    });
     expect(graphIntegrityIssues(patched)).toEqual([]);
   });
 
   it("refuses a patch that would empty the document", () => {
-    const error = expectRejected([{ op: "remove_node", id: "health-route" }], minimalGraph);
+    const error = expectRejected(
+      [{ op: "remove_node", id: "health-route" }],
+      minimalGraph,
+    );
     expect(error.code).toBe("INVALID_DOCUMENT");
   });
 
@@ -169,7 +195,7 @@ describe("applying a patch", () => {
               kind: "sync",
               delta: "unchanged",
               animated: true,
-              files: [],
+              files: [{ path: "test/fixture.ts", revision: "head" }],
             },
           ],
         },
@@ -184,21 +210,28 @@ describe("applying a patch", () => {
       {
         op: "update_flow",
         id: "send-pipeline",
-        patch: { participants: [{ node: "queue-route" }, { node: "broadcast-queue" }] },
+        patch: {
+          participants: [{ node: "queue-route" }, { node: "broadcast-queue" }],
+        },
       },
     ]);
     expect(error.code).toBe("BROKEN_REFERENCE");
   });
 
   it("hands back a document that parses", () => {
-    const patched = expectApplied([{ op: "remove_node", id: "send-single-email" }]);
+    const patched = expectApplied([
+      { op: "remove_node", id: "send-single-email" },
+    ]);
     expect(safeParseGraphDoc(patched).ok).toBe(true);
   });
 });
 
 describe("applying a patch document", () => {
   const applied = () => {
-    const result = applyPatchDoc(broadcastBaselineGraph, broadcastBaselinePatch);
+    const result = applyPatchDoc(
+      broadcastBaselineGraph,
+      broadcastBaselinePatch,
+    );
     if (!result.ok) throw result.error;
     return result.value;
   };
@@ -206,7 +239,9 @@ describe("applying a patch document", () => {
   it("carries the baseline map from the base commit to the head commit", () => {
     const patched = applied();
 
-    expect(patched.provenance.head.sha).toBe(broadcastBaselinePatch.target.toSha);
+    expect(patched.provenance.head.sha).toBe(
+      broadcastBaselinePatch.target.toSha,
+    );
     expect(patched.provenance.base.sha).toBe(patched.provenance.head.sha);
     expect(graphIntegrityIssues(patched)).toEqual([]);
   });
@@ -229,14 +264,18 @@ describe("applying a patch document", () => {
   it("refuses a patch that would leave a change annotation in the map", () => {
     const patch: PatchDoc = {
       ...broadcastBaselinePatch,
-      ops: [{ op: "update_node", id: "queue-route", patch: { delta: "modified" } }],
+      ops: [
+        { op: "update_node", id: "queue-route", patch: { delta: "modified" } },
+      ],
     };
     const result = applyPatchDoc(broadcastBaselineGraph, patch);
 
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error.code).toBe("NOT_A_SNAPSHOT");
-    expect(result.error.message).toContain("node 'queue-route' is marked 'modified'");
+    expect(result.error.message).toContain(
+      "node 'queue-route' is marked 'modified'",
+    );
   });
 
   it("refuses a patch whose new flow carries change annotations in its steps", () => {
@@ -292,7 +331,9 @@ describe("applying a patch document", () => {
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error.code).toBe("NOT_A_SNAPSHOT");
-    expect(result.error.message).toContain("records the commit it reflects in full");
+    expect(result.error.message).toContain(
+      "records the commit it reflects in full",
+    );
   });
 
   it("refuses a map with no id, which no patch could name", () => {
@@ -314,14 +355,18 @@ describe("applying a patch document", () => {
     };
     const patch: PatchDoc = {
       ...broadcastBaselinePatch,
-      ops: [{ op: "update_node", id: "queue-route", patch: { delta: "unchanged" } }],
+      ops: [
+        { op: "update_node", id: "queue-route", patch: { delta: "unchanged" } },
+      ],
     };
     const result = applyPatchDoc(midChange, patch);
 
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error.code).toBe("NOT_A_SNAPSHOT");
-    expect(result.error.message).toContain("the graph being patched is not a stored map");
+    expect(result.error.message).toContain(
+      "the graph being patched is not a stored map",
+    );
   });
 
   it("refuses a map whose provenance straddles two commits", () => {
@@ -417,7 +462,9 @@ describe("applying a patch document", () => {
   });
 });
 
-const withSteps = (steps: NonNullable<GraphDocInput["walkthrough"]>["steps"]): GraphDoc =>
+const withSteps = (
+  steps: NonNullable<GraphDocInput["walkthrough"]>["steps"],
+): GraphDoc =>
   parseGraphDoc({ ...postmarkRefactorGraphInput, walkthrough: { steps } });
 
 const stepIds = (graph: GraphDoc): string[] | undefined =>
@@ -426,10 +473,16 @@ const stepIds = (graph: GraphDoc): string[] | undefined =>
 describe("carrying a walkthrough through a patch", () => {
   it("drops the members a step focused and keeps the step", () => {
     const patched = expectApplied([{ op: "remove_node", id: "postmark" }]);
-    const step = patched.walkthrough?.steps.find(({ id }) => id === "batches-of-500");
+    const step = patched.walkthrough?.steps.find(
+      ({ id }) => id === "batches-of-500",
+    );
 
-    if (step?.focus.kind !== "selection") throw new Error("expected a selection focus");
-    expect(step.focus.nodes).toEqual(["send-broadcast-bulk", "build-bulk-payload"]);
+    if (step?.focus.kind !== "selection")
+      throw new Error("expected a selection focus");
+    expect(step.focus.nodes).toEqual([
+      "send-broadcast-bulk",
+      "build-bulk-payload",
+    ]);
   });
 
   it("drops a step whose focus loses its last member", () => {
@@ -485,14 +538,26 @@ describe("carrying a walkthrough through a patch", () => {
       graph,
     );
 
-    expect(patched.views[0]?.children.map(({ id }) => id)).not.toContain("retired-path");
+    expect(patched.views[0]?.children.map(({ id }) => id)).not.toContain(
+      "retired-path",
+    );
     expect(stepIds(patched)).toEqual(["overview", "pipeline"]);
   });
 
   it("keeps a tour cut to two steps", () => {
     const graph = withSteps([
-      { id: "one", heading: "One", body: "The first stop.", stage: { kind: "view", view: "overview" } },
-      { id: "two", heading: "Two", body: "The second stop.", stage: { kind: "view", view: "overview" } },
+      {
+        id: "one",
+        heading: "One",
+        body: "The first stop.",
+        stage: { kind: "view", view: "overview" },
+      },
+      {
+        id: "two",
+        heading: "Two",
+        body: "The second stop.",
+        stage: { kind: "view", view: "overview" },
+      },
       {
         id: "three",
         heading: "Three",
@@ -501,13 +566,21 @@ describe("carrying a walkthrough through a patch", () => {
       },
     ]);
 
-    const patched = expectApplied([{ op: "remove_flow", id: "send-pipeline" }], graph);
+    const patched = expectApplied(
+      [{ op: "remove_flow", id: "send-pipeline" }],
+      graph,
+    );
     expect(stepIds(patched)).toEqual(["one", "two"]);
   });
 
   it("drops a tour cut below two steps, which is a caption rather than a walk", () => {
     const graph = withSteps([
-      { id: "one", heading: "One", body: "The first stop.", stage: { kind: "view", view: "overview" } },
+      {
+        id: "one",
+        heading: "One",
+        body: "The first stop.",
+        stage: { kind: "view", view: "overview" },
+      },
       {
         id: "two",
         heading: "Two",
@@ -516,7 +589,10 @@ describe("carrying a walkthrough through a patch", () => {
       },
     ]);
 
-    const patched = expectApplied([{ op: "remove_flow", id: "send-pipeline" }], graph);
+    const patched = expectApplied(
+      [{ op: "remove_flow", id: "send-pipeline" }],
+      graph,
+    );
     expect(patched.walkthrough).toBeUndefined();
   });
 
@@ -533,10 +609,28 @@ describe("carrying a walkthrough through a patch", () => {
         {
           id: "first",
           title: "First",
-          participants: [{ node: "queue-route" }, { node: "broadcast-queue" }, { node: "send-broadcast-bulk" }],
+          participants: [
+            { node: "queue-route" },
+            { node: "broadcast-queue" },
+            { node: "send-broadcast-bulk" },
+          ],
           messages: [
-            { id: "shared", from: "queue-route", to: "broadcast-queue", label: "enqueue", delta: "added" },
-            { id: "keep", from: "broadcast-queue", to: "send-broadcast-bulk", label: "trigger", delta: "added" },
+            {
+              id: "shared",
+              from: "queue-route",
+              to: "broadcast-queue",
+              label: "enqueue",
+              delta: "added",
+              files: [{ path: "test/fixture.ts", revision: "head" }],
+            },
+            {
+              id: "keep",
+              from: "broadcast-queue",
+              to: "send-broadcast-bulk",
+              label: "trigger",
+              delta: "added",
+              files: [{ path: "test/fixture.ts", revision: "head" }],
+            },
           ],
         },
         {
@@ -544,7 +638,14 @@ describe("carrying a walkthrough through a patch", () => {
           title: "Second",
           participants: [{ node: "broadcast-queue" }, { node: "postmark" }],
           messages: [
-            { id: "shared", from: "broadcast-queue", to: "postmark", label: "post", delta: "added" },
+            {
+              id: "shared",
+              from: "broadcast-queue",
+              to: "postmark",
+              label: "post",
+              delta: "added",
+              files: [{ path: "test/fixture.ts", revision: "head" }],
+            },
           ],
         },
       ],
@@ -568,10 +669,16 @@ describe("carrying a walkthrough through a patch", () => {
     });
 
   it("measures a focused flow step against the flow on the stage, not the document", () => {
-    const patched = expectApplied([{ op: "remove_node", id: "queue-route" }], sharedStepIds());
-    const step = patched.walkthrough?.steps.find(({ id }) => id === "over-first");
+    const patched = expectApplied(
+      [{ op: "remove_node", id: "queue-route" }],
+      sharedStepIds(),
+    );
+    const step = patched.walkthrough?.steps.find(
+      ({ id }) => id === "over-first",
+    );
 
-    if (step?.focus.kind !== "selection") throw new Error("expected a selection focus");
+    if (step?.focus.kind !== "selection")
+      throw new Error("expected a selection focus");
     expect(step.focus.messages).toEqual(["keep"]);
     expect(graphIntegrityIssues(patched)).toEqual([]);
   });
@@ -593,7 +700,14 @@ describe("carrying a walkthrough through a patch", () => {
           title: "First",
           participants: [{ node: "queue-route" }, { node: "broadcast-queue" }],
           messages: [
-            { id: "only-in-first", from: "queue-route", to: "broadcast-queue", label: "enqueue", delta: "added" },
+            {
+              id: "only-in-first",
+              from: "queue-route",
+              to: "broadcast-queue",
+              label: "enqueue",
+              delta: "added",
+              files: [{ path: "test/fixture.ts", revision: "head" }],
+            },
           ],
         },
         {
@@ -601,7 +715,14 @@ describe("carrying a walkthrough through a patch", () => {
           title: "Second",
           participants: [{ node: "broadcast-queue" }, { node: "postmark" }],
           messages: [
-            { id: "only-in-second", from: "broadcast-queue", to: "postmark", label: "post", delta: "added" },
+            {
+              id: "only-in-second",
+              from: "broadcast-queue",
+              to: "postmark",
+              label: "post",
+              delta: "added",
+              files: [{ path: "test/fixture.ts", revision: "head" }],
+            },
           ],
         },
       ],
@@ -667,8 +788,18 @@ describe("carrying a walkthrough through a patch", () => {
       ...broadcastBaselineGraph,
       walkthrough: {
         steps: [
-          { id: "one", heading: "One", body: "The first stop.", focus: { kind: "all" } },
-          { id: "two", heading: "Two", body: "The second stop.", focus: { kind: "all" } },
+          {
+            id: "one",
+            heading: "One",
+            body: "The first stop.",
+            focus: { kind: "all" },
+          },
+          {
+            id: "two",
+            heading: "Two",
+            body: "The second stop.",
+            focus: { kind: "all" },
+          },
         ],
       },
     });
