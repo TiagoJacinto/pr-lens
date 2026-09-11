@@ -46,6 +46,12 @@ inputs:
   github-token:
     description: Token used to publish the SVGs and post the comment.
     default: ${{ github.token }}
+  canvas-url:
+    description: Base URL of the compatible interactive canvas service. Leave empty to skip canvas publishing.
+    default: ""
+  canvas-publish-token:
+    description: Service token accepted by the private canvas publish endpoint.
+    default: ""
 
 outputs:
   graph:
@@ -54,6 +60,9 @@ outputs:
   assets-url:
     description: Base URL the rendered SVGs are published at.
     value: ${{ steps.publish.outputs.assets-url }}
+  canvas-url:
+    description: URL of the interactive canvas for this pull request.
+    value: ${{ steps.canvas.outputs.canvas-url }}
 
 runs:
   using: composite
@@ -129,6 +138,17 @@ runs:
         HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         PR_NUMBER: ${{ github.event.pull_request.number }}
 
+    - name: Publish the interactive canvas
+      id: canvas
+      shell: bash
+      run: bash "${GITHUB_ACTION_PATH}/scripts/publish-canvas.sh"
+      env:
+        CANVAS_API: ${{ inputs.canvas-url }}
+        CANVAS_PUBLISH_TOKEN: ${{ inputs.canvas-publish-token }}
+        GITHUB_REPOSITORY: ${{ github.repository }}
+        GRAPH: ${{ steps.analyze.outputs.graph }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+
     - name: Post the comment
       if: inputs.comment == 'true'
       shell: bash
@@ -136,6 +156,7 @@ runs:
       env:
         CLI_VERSION: ${{ inputs.cli-version }}
         ASSETS_URL: ${{ steps.publish.outputs.assets-url }}
+        CANVAS_URL: ${{ steps.canvas.outputs.canvas-url }}
         BRANDING_OFF: ${{ inputs.branding == 'false' && '1' || '' }}
         COMMENT_AUTHOR: ${{ inputs.comment-author }}
         GH_TOKEN: ${{ inputs.github-token }}

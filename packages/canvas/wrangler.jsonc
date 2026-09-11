@@ -1,0 +1,20 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "pr-lens-canvas",
+  "main": "src/worker.ts",
+  "compatibility_date": "2026-03-17",
+  "vars": {
+    "ALLOWED_REPOSITORY_OWNER": "TiagoJacinto"
+  },
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "pr-lens-canvas",
+      "database_id": "REPLACE_WITH_D1_DATABASE_ID"
+    }
+  ]
+}

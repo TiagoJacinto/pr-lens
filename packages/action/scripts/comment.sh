@@ -56,6 +56,10 @@ cli comment \
   ${BRANDING_OFF:+--no-branding} \
   --out "${BODY}"
 
+if [ -n "${CANVAS_URL:-}" ]; then
+  printf '\n\n<a href="%s">Open the interactive canvas</a>\n' "${CANVAS_URL}" >> "${BODY}"
+fi
+
 MARKER="$(cli comment --print-marker)"
 
 gh api "repos/${GITHUB_REPOSITORY}/issues/${PR_NUMBER}/comments" --paginate --jq '.[]' \

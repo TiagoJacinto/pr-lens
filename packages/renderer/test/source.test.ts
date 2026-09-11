@@ -10,42 +10,46 @@ describe("buildGithubPermalink", () => {
       repo: { owner: "cold tea", name: "pr lens", host: "github.com" },
       base: { sha: "b".repeat(40) },
       head: { sha: "a".repeat(40) },
+      pullRequest: { number: 42 },
     },
   };
 
-  it("uses the captured head and base revisions", () => {
+  it("pins pull-request links to the captured head and base revisions", () => {
     expect(
       buildGithubPermalink(doc, { path: "src/app.ts", revision: "head" }),
-    ).toContain(`/blob/${"a".repeat(40)}/src/app.ts`);
+    ).toContain(`/pull/42/files/${"a".repeat(40)}#diff-`);
     expect(
       buildGithubPermalink(doc, { path: "src/app.ts", revision: "base" }),
-    ).toContain(`/blob/${"b".repeat(40)}/src/app.ts`);
+    ).toContain(`/pull/42/files/${"a".repeat(40)}#diff-`);
   });
 
-  it("builds single-line and line-range anchors", () => {
+  it("builds single-line and line-range diff anchors", () => {
     expect(
       buildGithubPermalink(doc, {
         path: "src/app.ts",
         startLine: 7,
         revision: "head",
       }),
-    ).toMatch(/#L7$/);
+    ).toMatch(/#diff-[0-9a-f]{64}R7$/);
     expect(
       buildGithubPermalink(doc, {
         path: "src/app.ts",
         startLine: 7,
         endLine: 11,
-        revision: "head",
+        revision: "base",
       }),
-    ).toMatch(/#L7-L11$/);
+    ).toMatch(/#diff-[0-9a-f]{64}L7-L11$/);
   });
 
   it("encodes repository components and path segments", () => {
     expect(
-      buildGithubPermalink(doc, {
-        path: "src/hello world.ts",
-        revision: "head",
-      }),
+      buildGithubPermalink(
+        {
+          ...doc,
+          provenance: { ...doc.provenance, pullRequest: undefined },
+        },
+        { path: "src/hello world.ts", revision: "head" },
+      ),
     ).toBe(
       `https://github.com/cold%20tea/pr%20lens/blob/${"a".repeat(40)}/src/hello%20world.ts`,
     );

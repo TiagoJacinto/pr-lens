@@ -25,6 +25,10 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./browser": {
+      "types": "./dist/browser.d.ts",
+      "default": "./dist/browser.js"
+    },
     "./package.json": "./package.json"
   },
   "files": [
@@ -47,7 +51,8 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@coldtea/pr-lens-schema": "workspace:*"
+    "@coldtea/pr-lens-schema": "workspace:*",
+    "@noble/hashes": "2.4.0"
   },
   "devDependencies": {
     "@types/node": "^20.19.0",
