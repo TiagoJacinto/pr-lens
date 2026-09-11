@@ -165,6 +165,8 @@ const Canvas = ({ graph }: { graph: GraphDoc }) => {
   const [drag, setDrag] = useState<{ x: number; y: number; pan: { x: number; y: number } }>();
   const [walkthroughOpen, setWalkthroughOpen] = useState(false);
   const [walkthroughStep, setWalkthroughStep] = useState(0);
+  const [helpOpen, setHelpOpen] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
   const selected = diagrams.find((diagram) => diagram.id === selectedId) ?? diagrams[0];
   const walkthrough = graph.walkthrough?.steps ?? [];
   const currentStep = walkthrough[walkthroughStep];
@@ -190,6 +192,11 @@ const Canvas = ({ graph }: { graph: GraphDoc }) => {
   const resetView = () => {
     setZoom(1);
     setPan({ x: 0, y: 0 });
+  };
+  const copyShareLink = async () => {
+    await navigator.clipboard.writeText(window.location.href);
+    setShareCopied(true);
+    window.setTimeout(() => setShareCopied(false), 1800);
   };
   const move = (event: WheelEvent<HTMLElement>) => {
     if (!event.ctrlKey) return;
@@ -238,6 +245,12 @@ const Canvas = ({ graph }: { graph: GraphDoc }) => {
           <button onClick={resetView} type="button">
             Fit
           </button>
+          <button onClick={() => void copyShareLink()} type="button">
+            {shareCopied ? "Copied" : "Share"}
+          </button>
+          <button aria-label="How to move around" onClick={() => setHelpOpen((open) => !open)} type="button">
+            ?
+          </button>
           {THEMES.map((candidate) => (
             <button
               className={candidate === theme ? "selected" : ""}
@@ -261,6 +274,12 @@ const Canvas = ({ graph }: { graph: GraphDoc }) => {
       >
         <SourceOverlay diagram={selected} graph={graph} pan={pan} theme={theme} zoom={zoom} />
       </section>
+      {helpOpen && (
+        <aside className="help" aria-label="How to move around">
+          <strong>How to move around</strong>
+          <p>Drag the canvas to pan. Use Fit to reset. Hold Ctrl while scrolling, or use + and −, to zoom.</p>
+        </aside>
+      )}
       {walkthroughOpen && currentStep !== undefined && (
         <aside className="walkthrough" aria-label="Walkthrough">
           <strong>

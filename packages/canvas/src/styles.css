@@ -34,7 +34,9 @@ kbd { color: #64727d; font-size: 11px; margin-left: 3px; }
 .source-target { border-radius: 8px; display: block; position: absolute; z-index: 1; }
 .source-target:focus-visible { outline: 3px solid #1f9d55; outline-offset: 2px; }
 .source-target:hover { background: rgba(31,157,85,.09); box-shadow: 0 0 0 1px rgba(31,157,85,.6); }
-.walkthrough { background: rgba(255,255,255,.97); border: 1px solid #dce3e7; border-radius: 10px; bottom: 82px; box-shadow: 0 8px 28px rgba(36,49,61,.14); left: 24px; max-width: 330px; padding: 16px; position: fixed; z-index: 3; }
+.walkthrough, .help { background: rgba(255,255,255,.97); border: 1px solid #dce3e7; border-radius: 10px; bottom: 82px; box-shadow: 0 8px 28px rgba(36,49,61,.14); left: 24px; max-width: 330px; padding: 16px; position: fixed; z-index: 3; }
+.help { bottom: auto; left: auto; right: 24px; top: 78px; }
+.help p { color: #52616c; margin: 8px 0 0; }
 .walkthrough strong { color: #1f9d55; font-size: 12px; }
 .walkthrough h2 { font-size: 17px; margin: 8px 0 4px; }
 .walkthrough p { color: #52616c; margin: 0 0 14px; }
